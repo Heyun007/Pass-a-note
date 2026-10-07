@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
+// 注册 Service Worker（用于后台推送）
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(function(reg) {
+    console.log('Service Worker 注册成功');
+  }).catch(function(e) {
+    console.log('Service Worker 注册失败：', e);
+  });
+}
   console.log('小纸条 JS 成功加载并开始运行！');
 
   // ========== IndexedDB 封装 ==========
@@ -704,10 +712,8 @@ window.dreamReply = function(dreamId, userText) {
     }, recallDelay);
   }
 
-  if (chatSettings.pushEnabled && Notification && Notification.permission === 'granted') {
-  var d = dreamState.dreams.find(function(x) { return x.id === dreamId; });
-  sendBackgroundNotification(d ? d.name : '梦角', replyText);
-}
+ var d = dreamState.dreams.find(function(x) { return x.id === dreamId; });
+sendNotification(d ? d.name : '梦角', replyText);
 };
 
 // 聊天背景
@@ -878,10 +884,8 @@ setInterval(function() {
   if (Date.now() - last < minutes * 60 * 1000) return;
   if (Math.random() > 0.3) return; // 30% 概率主动
   window.dreamReply(dreamId, '');
-  if (chatSettings.pushEnabled && Notification && Notification.permission === 'granted') {
-    var d = dreamState.dreams.find(function(x) { return x.id === dreamId; });
-    new Notification(d ? d.name : '梦角', { body: '主动找你聊天了' });
-  }
+  var d = dreamState.dreams.find(function(x) { return x.id === dreamId; });
+sendNotification(d ? d.name : '梦角', '主动找你聊天了');
 }, 60 * 1000);
 
 // ========== 感知功能 ==========
@@ -2606,10 +2610,7 @@ window.seekSong = function(val) {
 // 启动时加载保存的歌单
 window.loadSavedPlaylist();
 
-    console.log('小纸条初始化完毕，所有按钮绑定完成！');
-});
-
-function sendBackgroundNotification(title, body) {
+  function sendBackgroundNotification(title, body) {
   // 如果网页在前台，就不弹系统通知了，免得吵到用户
   if (!document.hidden) return;
 
@@ -2624,3 +2625,47 @@ function sendBackgroundNotification(title, body) {
     new Notification(title, { body: body });
   }
 }
+
+  function sendNotification(title, body) {
+  // 推送开关关了就跳过
+  if (!chatSettings || !chatSettings.pushEnabled) return;
+  if (!('Notification' in window)) return;
+  if (Notification.permission !== 'granted') return;
+
+  // 如果你正在跟这个梦角聊天，就不弹了
+  var sc = document.getElementById('screenChat');
+  if (sc && sc.classList.contains('active') && dreamState.currentId) {
+    var cur = dreamState.dreams.find(function(d) { return d.id === dreamState.currentId; });
+    if (cur && cur.name === title) return;
+  }
+
+  var options = {
+    body: body,
+    icon: './icon.png',
+    badge: './icon.png',
+    tag: 'dream-' + Date.now(),
+    vibrate: [200, 100, 200],
+    data: { url: './' }
+  };
+
+  // 核心：通过 Service Worker 弹通知（移动端必须）
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(function(reg) {
+      reg.showNotification(title, options);
+    }).catch(function() {
+      fallbackNotification(title, options);
+    });
+  } else {
+    fallbackNotification(title, options);
+  }
+}
+
+function fallbackNotification(title, options) {
+  try {
+    var n = new Notification(title, options);
+    setTimeout(function() { n.close(); }, 5000);
+  } catch(e) {}
+}
+
+    console.log('小纸条初始化完毕，所有按钮绑定完成！');
+});

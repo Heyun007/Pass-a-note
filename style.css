@@ -1,0 +1,1284 @@
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+:root { --bg: #ffffff; --card: #ffffff; --text: #1d1d1f; --gray: #86868b; --border: #e5e5ea; --btn-dark: #1d1d1f; --theme-color: #007aff; --btn-dark-text: #ffffff; --shadow: 0 2px 8px rgba(0,0,0,0.05);   --global-font-size: 14px;
+  --global-font-color: var(--text);}
+body.dark { --bg: #1c1c1e; --card: #2c2c2e; --text: #f5f5f7; --gray: #98989d; --border: #3a3a3c; --btn-dark: #f5f5f7; --btn-dark-text: #1d1d1f; --shadow: 0 2px 8px rgba(0,0,0,0.3); }
+body { background: #e8e8e8; display: flex; justify-content: center; align-items: center; min-height: 100vh; transition: background 0.3s; }
+body.dark { background: #0a0a0a; }
+.phone { width: 390px; height: 844px; background: var(--bg); border-radius: 44px; overflow: hidden; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.25); transition: background 0.3s; }
+@media (max-width: 430px) { .phone { width: 100vw; height: 100vh; border-radius: 0; box-shadow: none; } }
+.screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; background: var(--bg); transition: background 0.3s; }
+.screen.active { display: flex; }
+.page { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; background: var(--bg); z-index: 20; animation: slideIn 0.25s ease-out; }
+.page.active { display: flex; }
+@keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.page-header {
+  display: flex;
+  align-items: center;
+  padding: 52px 16px 12px 16px;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+.page-header .back-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text); margin-left: 16px; margin-left: 40px; }
+.page-header h2 { font-size: 17px; font-weight: 600; color: var(--text); flex: 1; }
+.page-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; }
+.top-bar { display: flex; align-items: center; gap: 10px; padding: 52px 16px 12px; flex-shrink: 0; z-index: 10; }
+.icon-circle { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--card);color: var(--theme-color, var(--text)); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: var(--shadow); transition: transform 0.15s, background 0.2s; }
+.icon-circle:active { transform: scale(0.9); }
+.dream-selector { flex: 1; display: flex; align-items: center; gap: 10px; padding: 5px 14px 5px 6px; background: var(--card); border: 1px solid var(--border); border-radius: 24px; cursor: pointer; min-width: 0; box-shadow: var(--shadow); transition: background 0.2s; }
+.dream-selector:active { background: var(--border); }
+.avatar-circle { width: 36px; height: 36px; border-radius: 50%; background: #dff0ff; color: #007aff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; overflow: hidden; background-size: cover; background-position: center; }
+.avatar-circle.small { width: 40px; height: 40px; font-size: 14px; }
+.dream-info { flex: 1; min-width: 0; text-align: left; }
+.dream-name { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dream-status { font-size: 11px; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.arrow { display: flex; align-items: center; color: var(--gray); flex-shrink: 0; }
+.main-body { flex: 1; position: relative; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 60px; }
+.side-column { position: absolute; top: 160px; display: flex; flex-direction: column; gap: 16px; z-index: 5; }
+.left-column { left: 18px; }
+.right-column { right: 18px; }
+.func-circle { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--border); background: var(--card);color: var(--theme-color, var(--text)); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); transition: transform 0.15s, background 0.2s; }
+.func-circle:active { transform: scale(0.9); background: var(--border); }
+.bottom-area { padding: 12px 16px 34px; flex-shrink: 0; }
+.input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; width: 100%; box-sizing: border-box; overflow: hidden; }
+.chat-input { flex: 1; min-width: 0 !important; padding: 12px 20px; border: 1px solid var(--border); border-radius: 24px; font-size: 14px; outline: none; background: var(--card); color: var(--text); box-shadow: var(--shadow); transition: border-color 0.2s; }
+.send-btn { width: 44px; height: 44px; border-radius: 50%; border: none;background: var(--theme-color, var(--btn-dark)); color: var(--btn-dark-text); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.15s; }
+.send-btn:active { transform: scale(0.9); }
+.bottom-buttons { display: flex; gap: 10px; }
+.block-btn { flex: 1; height: 52px; border-radius: 16px; border: 1px solid var(--border); background: var(--card);color: var(--theme-color, var(--text)); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); transition: transform 0.15s, background 0.2s; }
+.block-btn:active { transform: scale(0.95); background: var(--border); }
+.screen-chat { padding: 0; }
+.chat-top-bar { display: flex; align-items: center; gap: 10px; padding: 52px 16px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.chat-dream-info { flex: 1; min-width: 0; }
+.chat-dream-name { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-dream-status { font-size: 11px; color: var(--gray); margin-top: 1px; }
+.icon-btn-dots { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 16px; background: var(--bg); min-height: 0; }
+.chat-bottom-bar { display: flex; align-items: center; gap: 8px; padding: 10px 12px 26px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.plus-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.chat-input-2 { flex: 1; min-width: 0; padding: 12px 16px; border: 1px solid var(--border); border-radius: 22px; font-size: 14px; outline: none; background: var(--card); color: var(--text); }
+.send-btn-2 { width: 40px; height: 40px; border-radius: 50%; border: none;background: var(--theme-color, var(--btn-dark)); color: var(--btn-dark-text); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.btn-black { padding: 10px 14px; border: none; border-radius: 10px; background: var(--btn-dark); color: var(--btn-dark-text); font-size: 13px; font-weight: 500; cursor: pointer; transition: transform 0.15s, opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-black:active { transform: scale(0.96); opacity: 0.8; }
+.card-toolbar { flex-shrink: 0; margin-bottom: 10px; }
+.card-toolbar-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.card-search { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; background: var(--bg); color: var(--text); outline: none; box-sizing: border-box; }
+.card-list-container { flex: 1; overflow-y: auto; padding: 4px 0; }
+.category-group { background: var(--bg); border-radius: 12px; margin-bottom: 10px; overflow: hidden; border: 1px solid var(--border); }
+.category-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; cursor: pointer; user-select: none; }
+.category-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.category-actions { display: flex; gap: 8px; align-items: center; }
+.category-actions svg { cursor: pointer; color: var(--gray); }
+.category-body { padding: 0 14px 12px; }
+.category-body.hidden { display: none; }
+.card-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: var(--card); border-radius: 8px; margin-bottom: 6px; border: 1px solid var(--border); transition: opacity 0.2s; }
+.card-item.blocked { opacity: 0.5; text-decoration: line-through; }
+.card-item-text { flex: 1; font-size: 13px; color: var(--text); word-break: break-word; margin-right: 10px; }
+.card-item-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.card-item-actions svg { cursor: pointer; color: var(--gray); }
+.add-card-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; box-sizing: border-box; }
+.add-card-modal.show { display: flex; }
+.add-card-box { background: var(--card); width: 100%; max-width: 320px; border-radius: 16px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
+.add-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-weight: 600; font-size: 15px; }
+.add-card-select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; background: var(--bg); color: var(--text); outline: none; font-size: 14px; }
+.add-card-textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 14px; background: var(--bg); color: var(--text); outline: none; font-size: 14px; resize: vertical; font-family: inherit; box-sizing: border-box; }
+.add-card-footer { display: flex; gap: 10px; }
+.dream-dropdown { position: absolute; top: 100%; left: 0; width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-top: 6px; z-index: 1000; display: none; overflow: hidden; animation: dropdownFade 0.2s ease-out; }
+.dream-dropdown.show { display: block; }
+@keyframes dropdownFade { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.dream-dropdown-list { max-height: 200px; overflow-y: auto; }
+.dream-dropdown-item { display: flex; align-items: center; padding: 10px 14px; gap: 10px; cursor: pointer; transition: background 0.15s; border-bottom: 1px solid var(--border); }
+.dream-dropdown-item:last-child { border-bottom: none; }
+.dream-dropdown-item.active { background: var(--bg); }
+.dream-dropdown-item .avatar-circle { width: 32px; height: 32px; font-size: 12px; }
+.dream-dropdown-item .dd-info { flex: 1; min-width: 0; text-align: left; }
+.dream-dropdown-item .dd-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.dream-dropdown-item .dd-status { font-size: 11px; color: var(--gray); margin-top: 2px; }
+.dream-list-item { display: flex; align-items: center; padding: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; cursor: pointer; gap: 12px; }
+.dream-list-item:active { background: var(--border); }
+.dream-list-item .avatar-circle { width: 48px; height: 48px; font-size: 18px; }
+.dream-list-item .dream-list-info { flex: 1; min-width: 0; text-align: left; }
+.dream-list-item .dream-list-name { font-size: 15px; font-weight: 600; color: var(--text); }
+.dream-list-item .dream-list-status { font-size: 12px; color: var(--gray); margin-top: 4px; }
+.dream-list-item .dream-list-actions { display: flex; gap: 8px; align-items: center; }
+.user-prompt-display { text-align: center; font-size: 13px; color: var(--gray); margin-bottom: 16px; word-break: break-word; min-height: 20px; }
+.user-prompt-display span { color: var(--text); font-weight: 500; }
+.paper-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; justify-items: center; }
+.paper-card { width: 80px; height: 110px; perspective: 1000px; cursor: pointer; position: relative; }
+.paper-inner { width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); transform-style: preserve-3d; position: relative; }
+.paper-card.flipped .paper-inner { transform: rotateY(180deg); }
+.paper-front, .paper-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 8px; font-size: 12px; line-height: 1.4; word-break: break-all; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.paper-back { background: var(--btn-dark); color: var(--btn-dark-text); border: 1px solid var(--border); }
+.paper-back svg { opacity: 0.3; width: 26px; height: 26px; }
+.paper-front { background: var(--card); color: var(--text); border: 1px solid var(--border); transform: rotateY(180deg); }
+.paper-card.disabled { pointer-events: none; opacity: 0.7; }
+.history-filter-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: var(--card); border-bottom: 1px solid var(--border); flex-shrink: 0; gap: 8px; }
+.filter-date-input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 14px; font-weight: 600; outline: none; flex: 1; text-align: center; }
+.filter-select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 13px; outline: none; max-width: 120px; }
+.history-item { display: flex; gap: 12px; padding: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; transition: opacity 0.2s; }
+.history-item.selected { border-color: var(--blue); background: rgba(0,122,255,0.05); }
+.history-item-left { flex: 1; min-width: 0; }
+.history-time { font-size: 12px; color: var(--gray); margin-bottom: 6px; font-weight: 500; }
+.history-user-input { font-size: 13px; color: var(--text); background: var(--card); padding: 8px 10px; border-radius: 8px; margin-bottom: 8px; word-break: break-word; line-height: 1.4; }
+.history-user-input::before { content: '你说：'; color: var(--gray); font-size: 12px; }
+.history-drawn-card { font-size: 13px; color: var(--text); background: var(--card); padding: 8px 10px; border-radius: 8px; word-break: break-word; line-height: 1.4; cursor: pointer; }
+.history-drawn-card::before { content: '抽到：'; color: var(--gray); font-size: 12px; }
+.history-item-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 6px; min-width: 100px; }
+.history-supplement-label { font-size: 11px; color: var(--gray); }
+.history-supplement-card { font-size: 12px; color: var(--btn-dark-text); background: var(--btn-dark); padding: 8px 10px; border-radius: 8px; word-break: break-word; line-height: 1.4; cursor: pointer; text-align: right; max-height: 72px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; transition: transform 0.1s; }
+.history-supplement-card:active { transform: scale(0.96); opacity: 0.8; }
+.history-edit-checkbox { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; margin-top: 4px; }
+.history-edit-checkbox.checked { background: var(--blue); border-color: var(--blue); color: #fff; font-size: 12px; font-weight: 700; }
+.history-bottom-bar { display: flex; gap: 10px; padding: 12px 16px 26px; border-top: 1px solid var(--border); background: var(--card); flex-shrink: 0; }
+.history-bottom-bar button { flex: 1; padding: 10px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
+/* 纸条加载动画 */
+.paper-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; color: var(--gray); font-size: 14px; animation: fadeIn 0.3s ease-out; }
+.spinner { animation: rotate 2s linear infinite; width: 40px; height: 40px; margin-bottom: 16px; }
+.spinner .path { stroke: var(--text); stroke-linecap: round; animation: dash 1.5s ease-in-out infinite; }
+@keyframes rotate { 100% { transform: rotate(360deg); } }
+@keyframes dash { 0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; } 50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; } 100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; } }
+/* 暗号专属样式 */
+.secret-draw-area { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 10px; background: var(--bg); border-radius: 16px; border: 1px dashed var(--border); flex-shrink: 0; }
+.secret-result { font-size: 18px; font-weight: 600; color: var(--text); text-align: center; line-height: 1.6; min-height: 60px; display: flex; align-items: center; justify-content: center; word-break: break-word; padding: 0 10px; }
+#drawSecretBtn:disabled { opacity: 0.5; background: var(--border); color: var(--gray); cursor: not-allowed; transform: none; }
+/* 拍一拍悬浮提示 */
+.poke-toast { position: absolute; top: 105px; left: 0; right: 0; margin: 0 auto; width: fit-content; background: rgba(0,0,0,0.75); color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 13px; z-index: 2000; opacity: 0; transform: translateY(-10px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.poke-toast.show { opacity: 1; transform: translateY(0); }
+/* 抉择卡片 */
+.history-choice-card { background: var(--card); border-radius: 12px; padding: 14px; border: 1px solid var(--border); margin-bottom: 10px; }
+.history-choice-question { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+.history-choice-option { font-size: 13px; color: var(--text); padding: 8px 12px; border-radius: 8px; background: var(--bg); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.history-choice-option.selected { background: var(--btn-dark); color: var(--btn-dark-text); font-weight: 500; }
+.history-choice-option.selected::before { content: '✓'; font-size: 12px; }
+/* 抉择选项输入框 */
+.choice-option-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.choice-option-row input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; background: var(--bg); color: var(--text); }
+.choice-option-row span { color: var(--red); cursor: pointer; font-size: 16px; padding: 0 4px; }
+
+/* ========== 日记样式 ========== */
+ .diary-item { display: flex; gap: 12px; padding: 14px; background: var(--bg); border-bottom: 1px solid var(--border); position: relative; }
+.diary-item-avatar { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+.diary-item-body { flex: 1; min-width: 0; }
+.diary-item-name { font-size: 14px; font-weight: 600; color: #576b95; margin-bottom: 4px; }
+.diary-item-content { font-size: 14px; color: var(--text); line-height: 1.5; word-break: break-word; white-space: pre-wrap; }
+.diary-item-tags { display: flex; gap: 6px; margin-top: 8px; }
+.diary-item-tags span { font-size: 11px; padding: 3px 10px; border-radius: 10px; background: #f0f0f5; color: #666; }
+.diary-comment-item { display: flex; gap: 8px; margin-top: 8px; padding: 8px; background: var(--bg); border-radius: 8px; font-size: 12px; color: var(--text); }
+.diary-comment-item-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
+.diary-cover { position: relative; width: 100%; height: 180px; background-size: cover; background-position: center; cursor: pointer; flex-shrink: 0; }
+
+/* ========== 信箱样式 ========== */
+.mail-item { padding: 14px 16px; border-bottom: 1px solid var(--border); background: var(--card); cursor: pointer; position: relative; }
+.mail-item:active { background: var(--border); }
+.mail-item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.mail-item-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.mail-item-preview { font-size: 13px; color: var(--gray); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mail-item-time { font-size: 11px; color: #bbb; margin-top: 4px; }
+.mail-item-status { font-size: 11px; color: var(--gray); }
+.mail-item-status.delivered { color: var(--green); }
+
+/* ========== 通话悬浮窗 ========== */
+.call-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 3000; }
+.call-overlay.active { display: flex; }
+.call-card { position: relative; background: var(--card); border-radius: 20px; width: 280px; padding: 30px 20px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.call-avatar { width: 70px; height: 70px; border-radius: 50%; background: #dff0ff; color: #007aff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 600; margin: 0 auto 12px; background-size: cover; background-position: center; }
+.call-name { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.call-status { font-size: 13px; color: var(--gray); margin-bottom: 16px; }
+.call-timer { font-size: 28px; font-weight: 300; color: var(--text); margin-bottom: 20px; display: none; }
+.call-timer.show { display: block; }
+.call-buttons { display: flex; justify-content: center; gap: 20px; }
+.call-buttons button { padding: 10px 28px; border-radius: 24px; font-size: 14px; }
+
+/* ========== 迷你通话悬浮球 ========== */
+.call-mini { display: none; position: absolute; bottom: 20px; right: 20px; z-index: 2500; background: #ffffff; border: 1px solid #e5e5ea; border-radius: 20px; padding: 10px 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.call-mini.show { display: flex; align-items: center; gap: 6px; }
+.call-mini .mini-time { font-size: 13px; color: #000000; font-weight: 500; }
+.call-mini svg { width: 16px; height: 16px; color: #000000; }
+.call-mini { display: none; position: absolute; bottom: 20px; right: 20px; z-index: 2500; background: #ffffff; border: 1px solid #e5e5ea; border-radius: 20px; padding: 10px 16px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.call-mini.show { display: flex; align-items: center; gap: 6px; }
+.call-mini .mini-time { font-size: 13px; color: #000000; font-weight: 500; }
+.call-mini svg { width: 16px; height: 16px; color: #000000; }
+
+/* ========== 聊天副页面 ========== */
+.chat-dream-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.chat-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 52px 12px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--bg);
+  min-height: 0;
+}
+.chat-msg-row {
+  display: flex;
+  margin-bottom: 12px;
+}
+.chat-msg-row.user {
+  justify-content: flex-end;
+}
+.chat-msg-row.dream {
+  justify-content: flex-start;
+}
+.chat-bubble {
+  max-width: 78%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.chat-msg-row.user .chat-bubble {
+  background: var(--theme-color, #007aff);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.chat-msg-row.dream .chat-bubble {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+.chat-quote {
+  font-size: 12px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border-left: 3px solid var(--theme-color, #007aff);
+  background: rgba(0,0,0,0.04);
+  border-radius: 6px;
+  color: var(--gray);
+}
+.chat-bottom-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 26px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg);
+}
+.plus-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.chat-input-2 {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  font-size: 14px;
+  outline: none;
+  background: var(--card);
+  color: var(--text);
+}
+.send-btn-2 {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--theme-color, var(--btn-dark));
+  color: var(--btn-dark-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.chat-sheet-mask,
+.chat-settings-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  z-index: 3000;
+}
+.chat-sheet-mask.show,
+.chat-settings-mask.show {
+  display: flex;
+  align-items: flex-end;
+}
+.chat-sheet {
+  width: 100%;
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  padding: 20px 16px 30px;
+  animation: slideUp 0.25s ease-out;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.chat-sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.chat-sheet-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+.chat-sheet-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--theme-color, #007aff);
+}
+.chat-settings-mask.show {
+  align-items: center;
+  justify-content: center;
+}
+.chat-settings-panel {
+  width: 90%;
+  max-width: 340px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--card);
+  border-radius: 16px;
+  padding: 18px;
+}
+.chat-settings-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+.chat-setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text);
+}
+.chat-setting-item:last-of-type {
+  border-bottom: none;
+}
+.chat-settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+.chat-settings-actions .btn-black {
+  flex: 1;
+  min-width: 90px;
+  font-size: 12px;
+  padding: 8px 6px;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--border);
+  border-radius: 24px;
+  transition: 0.2s;
+}
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+.switch input:checked + .slider {
+  background: var(--theme-color, #007aff);
+}
+.switch input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* 消息包装器 + 时间戳 + 已读状态 */
+.chat-msg-wrap {
+  display: flex;
+  flex-direction: column;
+  max-width: 78%;
+}
+.chat-msg-row.user .chat-msg-wrap {
+  align-items: flex-end;
+}
+.chat-msg-row.dream .chat-msg-wrap {
+  align-items: flex-start;
+}
+.chat-bubble {
+  max-width: 100%;
+}
+.chat-msg-meta {
+  font-size: 11px;
+  color: var(--gray);
+  margin-top: 4px;
+  padding: 0 4px;
+}
+/* 居中系统提示 */
+.chat-system-msg {
+  text-align: center;
+  font-size: 12px;
+  color: var(--gray);
+  margin: 12px 0;
+  padding: 4px 12px;
+}
+
+.page-header .back-btn {
+  margin-left: 0 !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+.page-header .back-btn svg {
+  display: block !important;
+  margin: 0 auto !important;
+  position: static !important;
+}
+
+/* 正在输入气泡 */
+.chat-typing {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  margin: 0 12px 8px;
+  padding: 8px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  border-bottom-left-radius: 4px;
+  width: fit-content;
+  max-width: 70%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  animation: typingFadeIn 0.2s ease-out;
+}
+.chat-typing.show {
+  display: flex;
+}
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gray);
+  animation: typingBounce 1.2s infinite ease-in-out;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+.typing-text {
+  font-size: 12px;
+  color: var(--gray);
+  margin-left: 4px;
+}
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+@keyframes typingFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ====== 消息长按菜单（气泡旁的浮层） ====== */
+.msg-menu {
+  position: absolute;
+  background: var(--card);
+  border-radius: 10px;
+  padding: 4px 0;
+  min-width: 100px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+  z-index: 4000;
+  display: none;
+  overflow: hidden;
+}
+.msg-menu.show {
+  display: block;
+}
+.msg-menu-item {
+  padding: 10px 22px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+}
+.msg-menu-item:active {
+  background: var(--border);
+}
+.msg-menu-item.danger {
+  color: #ff3b30;
+}
+
+/* 撤回提示（居中灰色小字） */
+.chat-recall-tip {
+  text-align: center;
+  font-size: 12px;
+  color: var(--gray);
+  margin: 10px 0;
+  padding: 4px 12px;
+}
+
+/* ====== 半透明磨砂玻璃效果 ====== */
+
+/* 顶部栏圆形按钮（太阳、日历、聊天页面的切换和三个点） */
+.icon-circle,
+.icon-btn-dots {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark .icon-circle,
+body.dark .icon-btn-dots {
+  background: rgba(44, 44, 46, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 主页面右侧“切换聊天模式”按钮 */
+#switchModeBtn {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark #switchModeBtn {
+  background: rgba(44, 44, 46, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 梦角选择器（主页面 + 聊天页面顶部） */
+.dream-selector {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark .dream-selector {
+  background: rgba(44, 44, 46, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 底部输入框（主页面 + 聊天页面） */
+.chat-input,
+.chat-input-2 {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark .chat-input,
+body.dark .chat-input-2 {
+  background: rgba(44, 44, 46, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 聊天页面底部 + 号按钮 */
+.plus-btn {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark .plus-btn {
+  background: rgba(44, 44, 46, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ====== 聊天副页面 顶部/底部 透明化 ====== */
+
+/* 顶部栏、消息区、底部栏都透明，让 #screenChat 的背景图透出来 */
+#screenChat .chat-top-bar,
+#screenChat .chat-messages,
+#screenChat .chat-bottom-bar {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* 输入框和 + 号按钮加磨砂，避免看不清 */
+#screenChat .chat-input-2 {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark #screenChat .chat-input-2 {
+  background: rgba(44, 44, 46, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+#screenChat .plus-btn {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark #screenChat .plus-btn {
+  background: rgba(44, 44, 46, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+#screenChat .chat-top-bar {
+  padding-top: 28px !important;
+}
+
+/* ====== 感知页面 ====== */
+#pageTarot { background: var(--bg); }
+#pageTarot .page-header {
+  padding-top: 28px !important;
+  border-bottom: none !important;
+  background: transparent !important;
+}
+.tarot-dream-wrap { flex: 1; min-width: 0; }
+
+/* 图片/歌 切换按钮 */
+.tarot-mode-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 8px 0 14px;
+  flex-shrink: 0;
+}
+.tarot-tab {
+  width: 56px;
+  height: 38px;
+  border-radius: 19px;
+  border: 1px solid rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.5);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.tarot-tab.active {
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  border-color: rgba(0,0,0,0.8);
+}
+body.dark .tarot-tab {
+  background: rgba(44,44,46,0.5);
+  border-color: rgba(255,255,255,0.1);
+}
+body.dark .tarot-tab.active {
+  background: rgba(255,255,255,0.85);
+  color: #000;
+  border-color: rgba(255,255,255,0.85);
+}
+
+/* 中间内容区 */
+.tarot-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  min-height: 0;
+  overflow-y: auto;
+}
+.tarot-grid {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+  justify-items: center;
+  align-content: center;
+}
+
+.tarot-card {
+  width: 100%;
+  max-width: 90px;
+  aspect-ratio: 3 / 4;
+  border-radius: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  animation: tarotFadeIn 0.4s ease-out both;
+}
+
+/* 1张图：单列，卡片更大，居中 */
+.tarot-grid.count-1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+.tarot-grid.count-1 .tarot-card {
+  max-width: 120px;
+}
+
+/* 2张图：两列并排，居中 */
+.tarot-grid.count-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.tarot-grid.count-2 .tarot-card {
+  max-width: 110px;
+}
+
+/* 3张图：一行三列 */
+.tarot-grid.count-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.tarot-grid.count-3 .tarot-card {
+  max-width: 100px;
+}
+
+/* 4张图：两行两列（2x2） */
+.tarot-grid.count-4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.tarot-grid.count-4 .tarot-card {
+  max-width: 100px;
+}
+
+/* 5张图：3+2 排布，还是用三列，最后一张自动折行居中 */
+.tarot-grid.count-5 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.tarot-grid.count-5 .tarot-card {
+  max-width: 90px;
+}
+@keyframes tarotFadeIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+.tarot-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray);
+  font-size: 14px;
+}
+
+/* 底部栏 */
+.tarot-bottom-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 26px;
+  flex-shrink: 0;
+  background: transparent !important;
+}
+.tarot-bottom-bar.no-plus .plus-btn {
+  display: none !important;
+}
+.tarot-bottom-bar .chat-input-2 {
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255,255,255,0.7) !important;
+}
+body.dark .tarot-bottom-bar .chat-input-2 {
+  background: rgba(44,44,46,0.55) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+.tarot-bottom-bar .plus-btn {
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255,255,255,0.7) !important;
+}
+body.dark .tarot-bottom-bar .plus-btn {
+  background: rgba(44,44,46,0.55) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+/* + 号面板 */
+.tarot-plus-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  z-index: 3000;
+  align-items: flex-end;
+}
+.tarot-plus-mask.show { display: flex; }
+.tarot-plus-sheet {
+  width: 100%;
+  max-height: 75vh;
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  padding: 18px 16px 30px;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.25s ease-out;
+}
+.tarot-plus-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.tarot-plus-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.tarot-plus-actions .btn-black {
+  flex: 1;
+  font-size: 12px;
+  padding: 8px 4px;
+}
+.tarot-group-list {
+  flex: 1;
+  overflow-y: auto;
+}
+.tarot-group { margin-bottom: 16px; }
+.tarot-group-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.tarot-group-head-actions {
+  display: flex;
+  gap: 10px;
+}
+.tarot-group-head-actions svg {
+  cursor: pointer;
+  color: var(--gray);
+}
+.tarot-image-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.tarot-image-item {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--border);
+}
+.tarot-image-item .del {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff3b30;
+  color: #fff;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.tarot-image-grid.hidden {
+  display: none !important;
+}
+.tarot-group-head {
+  cursor: pointer;
+  user-select: none;
+}
+
+.tarot-prompt {
+  text-align: center;
+  font-size: 13px;
+  color: var(--gray);
+  margin-bottom: 16px;
+  min-height: 20px;
+  word-break: break-word;
+}
+.tarot-prompt span {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.voice-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255,255,255,0.7) !important;
+  color: var(--text);
+}
+body.dark .voice-btn {
+  background: rgba(44,44,46,0.55) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+.voice-btn.recording {
+  background: #ff3b30 !important;
+  border-color: #ff3b30 !important;
+  color: #fff !important;
+  animation: voicePulse 1s infinite;
+}
+@keyframes voicePulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,59,48,0.6); }
+  50% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(255,59,48,0); }
+}
+
+/* ====== 传歌模式样式 ====== */
+.song-user-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px);
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  width: fit-content;
+  margin-bottom: 10px;
+}
+body.dark .song-user-bar {
+  background: rgba(44, 44, 46, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.song-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--border);
+  background-size: cover;
+  background-position: center;
+}
+.song-username {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.vinyl-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+.vinyl-disc {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  animation: rotateVinyl 20s linear infinite;
+  animation-play-state: paused;
+  position: relative;
+}
+.vinyl-disc::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: #333;
+  border-radius: 50%;
+}
+.vinyl-cover {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  z-index: 2;
+}
+@keyframes rotateVinyl {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.lyrics-container {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  text-align: center;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: var(--gray);
+  line-height: 2;
+  scroll-behavior: smooth;
+  mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+}
+.lyrics-container .active-line {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 16px;
+  text-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.lyrics-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0 20px;
+  margin-bottom: 20px;
+}
+.progress-time {
+  font-size: 12px;
+  color: var(--gray);
+  width: 40px;
+  text-align: center;
+}
+.progress-bar {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+}
+.progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--theme-color, #007aff);
+  cursor: pointer;
+}
+
+.song-prompt {
+  text-align: center;
+  font-size: 13px;
+  color: var(--gray);
+  margin: 8px 0;
+  min-height: 20px;
+  word-break: break-word;
+  padding: 0 20px;
+}
+.song-prompt span {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ====== 感知页面 磨砂玻璃 ====== */
+
+/* 顶部栏透明 */
+#pageTarot .page-header {
+  background: transparent !important;
+  border-bottom: none !important;
+}
+
+/* 顶部圆形按钮磨砂 */
+#pageTarot .icon-btn-dots,
+#pageTarot .back-btn {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark #pageTarot .icon-btn-dots,
+body.dark #pageTarot .back-btn {
+  background: rgba(44, 44, 46, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 梦角选择器磨砂 */
+#pageTarot .dream-selector {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark #pageTarot .dream-selector {
+  background: rgba(44, 44, 46, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 传图/传歌 tab 按钮磨砂 */
+#pageTarot .tarot-tab {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark #pageTarot .tarot-tab {
+  background: rgba(44, 44, 46, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+#pageTarot .tarot-tab.active {
+  background: rgba(0, 0, 0, 0.8) !important;
+  color: #fff !important;
+  border-color: rgba(0, 0, 0, 0.8) !important;
+}
+body.dark #pageTarot .tarot-tab.active {
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: #000 !important;
+  border-color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* 底部栏透明 */
+#pageTarot .tarot-bottom-bar {
+  background: transparent !important;
+  border-top: none !important;
+}
+
+/* 输入框和 + 号按钮磨砂 */
+#pageTarot .tarot-bottom-bar .chat-input-2 {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark #pageTarot .tarot-bottom-bar .chat-input-2 {
+  background: rgba(44, 44, 46, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+#pageTarot .tarot-bottom-bar .plus-btn,
+#pageTarot .tarot-bottom-bar .voice-btn {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark #pageTarot .tarot-bottom-bar .plus-btn,
+body.dark #pageTarot .tarot-bottom-bar .voice-btn {
+  background: rgba(44, 44, 46, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 背景图铺满 */
+#pageTarot {
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* 传图、传歌内容区透明，让背景透出来 */
+#pageTarot .tarot-body,
+#pageTarot .tarot-mode-tabs {
+  background: transparent !important;
+}
+
+/* 歌单栏磨砂 */
+.song-user-bar {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+body.dark .song-user-bar {
+  background: rgba(44, 44, 46, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ====== 抉择卡片（聊天流内） ====== */
+.chat-choice-card {
+  width: 78%;
+  max-width: 260px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  /* 改为靠右：上8px，右边0，下8px，左边自动撑开 */
+  margin: 8px 0 8px auto !important; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  /* 强制自身靠右对齐 */
+  align-self: flex-end !important;
+  float: right !important;
+  position: relative !important;
+  left: auto !important;
+  right: 0 !important;
+}
+.chat-choice-question {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+  word-break: break-word;
+}
+.chat-choice-option {
+  font-size: 13px;
+  color: var(--text);
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+  word-break: break-word;
+  transition: all 0.2s;
+}
+.chat-choice-option.picked {
+  background: var(--theme-color, #007aff);
+  color: #fff;
+  border-color: var(--theme-color, #007aff);
+  font-weight: 600;
+}
+.chat-choice-tip {
+  font-size: 11px;
+  color: var(--gray);
+  margin-top: 6px;
+  text-align: right;
+}

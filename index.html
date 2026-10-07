@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>小纸条</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css">
+<script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
+</head>
+<body>
+<div class="phone" id="app">
+  <!-- 主页 -->
+  <div class="screen screen-main active" id="screenMain">
+    <div class="top-bar">
+      <button class="icon-circle" id="modeToggle" title="切换深浅色"></button>
+      <div style="position: relative; flex: 1; min-width: 0;" id="dreamSelectorWrap">
+        <div class="dream-selector" id="dreamSelector">
+          <div class="avatar-circle" id="dreamAvatar">头</div>
+          <div class="dream-info"><div class="dream-name" id="dreamName">未设置</div><div class="dream-status" id="dreamStatus">点击添加梦角</div></div>
+          <span class="arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <div class="dream-dropdown" id="dreamDropdown"><div class="dream-dropdown-list" id="dreamDropdownList"></div></div>
+      </div>
+      <button class="icon-circle" id="historyBtn" title="历史记录"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+    </div>
+    <div class="poke-toast" id="pokeToast"></div>
+    <div class="main-body" id="mainBody">
+      <div class="user-prompt-display" id="userPromptDisplay"></div>
+      <div class="paper-loading" id="paperLoading" style="display: none;">
+        <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle></svg>
+        <div class="loading-text">正在抽取纸条……</div>
+      </div>
+      <div class="paper-grid" id="paperGrid"></div>
+    </div>
+    <div class="side-column left-column">
+      <button class="func-circle" id="secretCodeBtn" title="暗号"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+      <button class="func-circle" id="pokeBtn" title="拍一拍"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 0 0-2-2"/><path d="M14 10V4a2 2 0 0 0-2-2"/><path d="M10 10.5V6a2 2 0 0 0-2-2"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></button>
+      <button class="func-circle" id="choiceBtn" title="抉择"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="6" x2="19" y2="6"/><path d="M5 6 2 13a3 3 0 0 0 6 0z"/><path d="M19 6l-3 7a3 3 0 0 0 6 0z"/><line x1="8" y1="21" x2="16" y2="21"/></svg></button>
+      <button class="func-circle" id="callBtn" title="通话"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></button>
+    </div>
+    <div class="side-column right-column">
+            <button class="func-circle" id="tarotBtn" title="感知"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+      <button class="func-circle" id="diaryBtn" title="日记"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></button>
+      <button class="func-circle" id="mailBtn" title="信箱"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg></button>
+      <button class="func-circle" id="switchModeBtn" title="切换聊天模式"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
+    </div>
+    <div class="bottom-area">
+      <div class="input-row">
+        <input type="text" class="chat-input" id="chatInput" placeholder="输入一句话，抽取纸条..." onkeydown="if(event.key==='Enter') window.sendChatMsgFromMain('chatInput')">
+        <button class="send-btn" id="sendBtn" onclick="window.sendChatMsgFromMain('chatInput')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      </div>
+      <div class="bottom-buttons">
+        <button class="block-btn" id="openCardPanelBtn" title="字卡"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="14" x2="13" y2="14"/></svg></button>
+        <button class="block-btn" id="settingsBtn" title="设置"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+        <button class="block-btn" id="beautifyBtn" title="美化"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/><circle cx="8.5" cy="12" r="1.2"/><circle cx="14" cy="8.5" r="1.2"/><circle cx="15.5" cy="14" r="1.2"/></svg></button>
+        <button class="block-btn" id="dreamRoleBtn" title="梦角"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 聊天模式 -->
+<div class="screen" id="screenChat">
+  <div class="chat-top-bar">
+    <div class="chat-dream-wrap">
+      <div class="dream-selector" id="chatDreamSelector">
+        <div class="avatar-circle small" id="chatAvatar">梦</div>
+        <div class="chat-dream-info">
+          <div class="chat-dream-name" id="chatDreamName">梦角</div>
+          <div class="chat-dream-status" id="chatDreamStatus">状态</div>
+        </div>
+        <span class="arrow">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </span>
+      </div>
+      <div class="dream-dropdown" id="chatDreamDropdown">
+        <div class="dream-dropdown-list" id="chatDreamDropdownList"></div>
+      </div>
+    </div>
+
+    <!-- 新增：切换回主页按钮，放在三个点左边 -->
+    <button class="icon-circle" id="chatSwitchBtn" title="切换回主页">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="17 1 21 5 17 9"/>
+        <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+        <polyline points="7 23 3 19 7 15"/>
+        <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+      </svg>
+    </button>
+
+    <button class="icon-btn-dots" id="chatSettingsBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <circle cx="12" cy="5" r="1.8"/>
+        <circle cx="12" cy="12" r="1.8"/>
+        <circle cx="12" cy="19" r="1.8"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- 聊天消息区 -->
+  <div class="chat-messages" id="chatMessages"></div>
+
+  <!-- 底部输入栏 -->
+   <div class="chat-typing" id="chatTyping">
+  <span class="typing-dot"></span>
+  <span class="typing-dot"></span>
+  <span class="typing-dot"></span>
+  <span class="typing-text" id="chatTypingText">正在输入中…</span>
+</div>
+  <div class="chat-bottom-bar">
+    <button class="plus-btn" id="chatPlusBtn" title="更多">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+        <button class="voice-btn" id="chatVoiceBtn" title="语音" onclick="window.toggleVoice()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+    </button>
+    <input type="text" class="chat-input-2" id="chatInput2" placeholder="输入消息..." onkeydown="if(event.key==='Enter') window.chatSend()">
+    <button class="send-btn-2" id="chatSendBtn" onclick="window.chatSend()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="5" y1="12" x2="19" y2="12"/>
+        <polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- 消息长按菜单 -->
+<div class="msg-menu" id="msgMenu">
+  <div class="msg-menu-item" data-action="quote">引用</div>
+  <div class="msg-menu-item" data-action="recall" id="msgMenuRecall">撤回</div>
+  <div class="msg-menu-item danger" data-action="delete">删除</div>
+</div>
+
+  <!-- + 号面板 -->
+  <div class="chat-sheet-mask" id="chatPlusMask" onclick="window.closeChatPlus()">
+    <div class="chat-sheet" onclick="event.stopPropagation()">
+      <div class="chat-sheet-grid">
+
+  <button class="chat-sheet-item" onclick="window.chatPlusAction('secret')">
+    <span class="chat-sheet-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+    </span>
+    <span>暗号</span>
+  </button>
+
+  <button class="chat-sheet-item" onclick="window.chatPlusAction('poke')">
+    <span class="chat-sheet-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 11V6a2 2 0 0 0-2-2"/>
+        <path d="M14 10V4a2 2 0 0 0-2-2"/>
+        <path d="M10 10.5V6a2 2 0 0 0-2-2"/>
+        <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
+      </svg>
+    </span>
+    <span>拍一拍</span>
+  </button>
+
+  <button class="chat-sheet-item" onclick="window.chatPlusAction('choice')">
+    <span class="chat-sheet-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="3" x2="12" y2="21"/>
+        <line x1="5" y1="6" x2="19" y2="6"/>
+        <path d="M5 6 2 13a3 3 0 0 0 6 0z"/>
+        <path d="M19 6l-3 7a3 3 0 0 0 6 0z"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+      </svg>
+    </span>
+    <span>抉择</span>
+  </button>
+
+  <button class="chat-sheet-item" onclick="window.chatPlusAction('call')">
+    <span class="chat-sheet-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+    </span>
+    <span>通话</span>
+  </button>
+
+  <button class="chat-sheet-item" onclick="window.chatPlusAction('modeToggle')">
+    <span class="chat-sheet-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="4"/>
+        <line x1="12" y1="2" x2="12" y2="5"/>
+        <line x1="12" y1="19" x2="12" y2="22"/>
+        <line x1="2" y1="12" x2="5" y2="12"/>
+        <line x1="19" y1="12" x2="22" y2="12"/>
+        <line x1="4.93" y1="4.93" x2="6.93" y2="6.93"/>
+        <line x1="17.07" y1="17.07" x2="19.07" y2="19.07"/>
+        <line x1="4.93" y1="19.07" x2="6.93" y2="17.07"/>
+        <line x1="17.07" y1="6.93" x2="19.07" y2="4.93"/>
+      </svg>
+    </span>
+    <span>小太阳</span>
+  </button>
+
+     </div>
+    </div>
+   </div>
+  </div>
+
+    <!-- 聊天设置页面 -->
+  <div class="screen page" id="pageChatSettings">
+    <div class="page-header">
+      <button class="back-btn" onclick="navigateTo('screenChat')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <h2>聊天设置</h2>
+    </div>
+    <div class="page-body">
+
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">聊天背景</label>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-black" style="flex:1;" onclick="document.getElementById('chatBgInput').click()">选择图片</button>
+          <button class="btn-black" style="width:80px;" onclick="window.resetChatBg()">清除</button>
+          <input type="file" id="chatBgInput" accept="image/*" style="display:none" onchange="window.handleChatBgUpload(event)">
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:16px;">
+  <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">自定义气泡CSS</label>
+  <textarea id="bubbleCssTextarea" class="add-card-textarea" placeholder="在此输入CSS代码，例如：&#10;.chat-msg-row.user .chat-bubble { background: #ffd700; }" style="min-height:100px;font-family:monospace;font-size:12px;"></textarea>
+  <div style="display:flex;gap:8px;margin-top:8px;">
+    <button class="btn-black" style="flex:1;" onclick="window.saveBubbleCss()">应用</button>
+    <button class="btn-black" style="width:80px;" onclick="window.resetBubbleCss()">清除</button>
+  </div>
+</div>
+
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">回复延迟（秒）</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="number" id="chatMinDelay" min="0" step="0.1" value="1" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);outline:none;">
+          <span>~</span>
+          <input type="number" id="chatMaxDelay" min="0" step="0.1" value="3" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);outline:none;">
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+        <label style="font-size:13px;color:var(--gray);">已读不回（25%概率）</label>
+        <input type="checkbox" id="chatIgnoreRead">
+      </div>
+
+      <div class="form-group" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+        <label style="font-size:13px;color:var(--gray);">梦角主动引用消息（20%概率）</label>
+        <input type="checkbox" id="chatQuoteEnabled">
+      </div>
+
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">拼接字卡（每次回复几张，逗号隔开）</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="number" id="chatCardMin" min="1" value="1" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);outline:none;">
+          <span>~</span>
+          <input type="number" id="chatCardMax" min="1" value="3" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);outline:none;">
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">主动找我（分钟未发消息后）</label>
+        <input type="number" id="chatActiveMinutes" min="1" value="30" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);outline:none;box-sizing:border-box;">
+      </div>
+
+      <div class="form-group" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+        <label style="font-size:13px;color:var(--gray);">后台消息推送</label>
+        <input type="checkbox" id="chatPushEnabled">
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+        <button class="btn-black" style="flex:1;" onclick="window.saveChatSettings()">保存设置</button>
+        <button class="btn-black" style="flex:1;background:rgba(255,59,48,0.9);" onclick="window.resetChatSettings()">恢复默认</button>
+      </div>
+      <button class="btn-black" style="width:100%;margin-top:10px;background:rgba(255,59,48,0.9);" onclick="window.clearChatMessages()">清除聊天记录</button>
+
+    </div>
+  </div>
+  <!-- 聊天设置页面结束 -->
+
+  <!-- 感知 -->
+<div class="screen page" id="pageTarot">
+  <div class="page-header">
+    <button type="button" class="back-btn" onclick="window.navigateTo('screenMain')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="tarot-dream-wrap" style="position:relative; flex:1; min-width:0;">
+      <div class="dream-selector" id="tarotDreamSelector">
+        <div class="avatar-circle small" id="tarotAvatar">梦</div>
+        <div class="chat-dream-info">
+          <div class="chat-dream-name" id="tarotDreamName">梦角</div>
+          <div class="chat-dream-status" id="tarotDreamStatus">状态</div>
+        </div>
+        <span class="arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="dream-dropdown" id="tarotDreamDropdown"><div class="dream-dropdown-list" id="tarotDreamDropdownList"></div></div>
+    </div>
+    <button type="button" class="icon-btn-dots" id="tarotSettingsBtn" onclick="window.navigateTo('pageTarotSettings')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+    </button>
+  </div>
+
+  <div class="tarot-mode-tabs">
+    <button type="button" class="tarot-tab active" id="tarotTabImage" onclick="window.switchTarotMode('image')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+    </button>
+    <button type="button" class="tarot-tab" id="tarotTabSong" onclick="window.switchTarotMode('song')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M9 18V5l12-2v13"/>
+        <circle cx="6" cy="18" r="3"/>
+        <circle cx="18" cy="16" r="3"/>
+      </svg>
+    </button>
+  </div>
+
+    <div class="tarot-body" id="tarotBody">
+    <!-- 传图模式内容（保留之前的） -->
+    <div id="tarotImageMode" style="width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1;">
+      <div class="tarot-prompt" id="tarotPrompt"></div>
+      <div class="tarot-loading" id="tarotLoading" style="display:none;">
+        <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle></svg>
+        <div class="loading-text" id="tarotLoadingText">正在抽取图片……</div>
+      </div>
+      <div class="tarot-grid" id="tarotGrid"></div>
+    </div>
+
+        <!-- 传歌模式内容 -->
+<div id="tarotSongMode" style="width:100%; height:100%; display:none; flex-direction:column; align-items:center; justify-content:space-between; padding:16px 0;">
+  <div class="song-user-bar" id="songUserBar" onclick="window.setupPlaylistId()">
+    <div class="song-avatar" id="songAvatar" style="display:flex; align-items:center; justify-content:center; font-size:16px;">♪</div>
+    <div class="song-username" id="songUsername">点击设置歌单</div>
+  </div>
+
+<div class="song-prompt" id="songPrompt"></div>
+
+  <div class="vinyl-wrapper" id="vinylWrapper" style="display:none;">
+    <div class="vinyl-disc" id="vinylDisc" onclick="window.togglePlay()">
+      <div class="vinyl-cover" id="vinylCover"></div>
+    </div>
+  </div>
+
+  <div class="lyrics-container" id="lyricsContainer" style="display:none;">
+    <div class="lyrics-content" id="lyricsContent"></div>
+  </div>
+
+  <div class="progress-wrapper" id="progressWrapper" style="display:none;">
+    <span class="progress-time" id="currentTime">00:00</span>
+    <input type="range" class="progress-bar" id="progressBar" min="0" max="100" value="0" oninput="window.seekSong(this.value)">
+    <span class="progress-time" id="totalTime">00:00</span>
+  </div>
+</div>
+  </div>
+
+  <div class="tarot-bottom-bar" id="tarotBottomBar">
+    <button type="button" class="plus-btn" id="tarotPlusBtn" onclick="window.openTarotPlus()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+    <button class="voice-btn" id="tarotVoiceBtn" title="语音" onclick="window.toggleTarotVoice()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+    </button>
+    <input type="text" class="chat-input-2" id="tarotInput" placeholder="输入一句话..." onkeydown="if(event.key==='Enter') window.tarotSend()">
+    <button type="button" class="send-btn-2" id="tarotSendBtn" onclick="window.tarotSend()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="5" y1="12" x2="19" y2="12"/>
+        <polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </button>
+ </div>
+</div>
+
+<!-- 感知 - 设置 -->
+<div class="screen page" id="pageTarotSettings">
+  <div class="page-header">
+    <button type="button" class="back-btn" onclick="window.navigateTo('pageTarot')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <h2>感知设置</h2>
+  </div>
+  <div class="page-body">
+    <div class="form-group" style="margin-bottom:16px;">
+      <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">传图模式背景</label>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-black" style="flex:1;" onclick="document.getElementById('tarotImageBgInput').click()">选择图片</button>
+        <button class="btn-black" style="width:80px;" onclick="window.resetTarotImageBg()">清除</button>
+        <input type="file" id="tarotImageBgInput" accept="image/*" style="display:none" onchange="window.handleTarotImageBg(event)">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:16px;">
+      <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">传歌模式背景</label>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-black" style="flex:1;" onclick="document.getElementById('tarotSongBgInput').click()">选择图片</button>
+        <button class="btn-black" style="width:80px;" onclick="window.resetTarotSongBg()">清除</button>
+        <input type="file" id="tarotSongBgInput" accept="image/*" style="display:none" onchange="window.handleTarotSongBg(event)">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 感知 - 图片库管理 -->
+<div class="screen page" id="pageTarotLibrary">
+  <div class="page-header">
+    <button type="button" class="back-btn" onclick="window.goBack()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <h2>图片库管理</h2>
+  </div>
+  <div class="page-body">
+    <div class="tarot-plus-actions">
+  <button type="button" class="btn-black" id="tarotAddImageBtn">+ 添加图片</button>
+  <button type="button" class="btn-black" onclick="window.addTarotGroup()">+ 新建分组</button>
+  <button type="button" class="btn-black" onclick="document.getElementById('tarotBatchInput').click()">批量导入</button>
+</div>
+    <input type="file" id="tarotImageInput" accept="image/*" multiple style="display:none" onchange="window.handleTarotImageUpload(event)">
+    <input type="file" id="tarotBatchInput" accept="image/*" multiple style="display:none" onchange="window.handleTarotImageUpload(event)">
+    <div class="tarot-group-list" id="tarotGroupList"></div>
+  </div>
+</div>
+
+  <!-- 历史记录 -->
+  <div class="screen page" id="pageHistory">
+    <div class="page-header"><button class="back-btn" onclick="navigateTo('screenMain')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><h2>历史记录</h2><button class="btn-black" style="padding: 8px 12px; font-size: 12px;" id="historyEditBtn" onclick="toggleHistoryEditMode()">编辑</button></div>
+    <div class="history-filter-bar"><input type="date" id="historyDatePicker" class="filter-date-input" onchange="onHistoryDateChange()"><select class="filter-select" id="historyDreamSelect" onchange="onHistoryDreamChange()"></select></div>
+    <div class="page-body" id="historyListContainer"></div>
+    <div class="history-bottom-bar" id="historyBottomBar" style="display:none;"><button class="btn-black" onclick="historySelectAll()">全选</button><button class="btn-black" style="background: rgba(255,59,48,0.9); color: #fff;" onclick="historyDeleteSelected()">删除</button><button class="btn-black" onclick="exitHistoryEdit()">取消</button></div>
+  </div>
+
+  <!-- 字卡 -->
+  <div class="screen page" id="pageWordCards">
+    <div class="page-header"><button class="back-btn" onclick="navigateTo('screenMain')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><h2>字卡</h2></div>
+    <div class="page-body">
+      <div class="card-toolbar"><div class="card-toolbar-row"><button class="btn-black" onclick="openAddCardModal()">+ 添加字卡</button><button class="btn-black" onclick="addCategoryPrompt()">+ 新建分类</button><button class="btn-black" onclick="dedupeCards()">去重</button></div><input class="card-search" type="text" id="cardSearchInput" placeholder="搜索字卡内容..." oninput="onCardSearch(this.value)"></div>
+      <div class="card-list-container" id="cardListContainer"></div>
+      <div class="card-toolbar-row" style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;"><button class="btn-black" onclick="document.getElementById('importCardInput').click()">导入字卡</button><button class="btn-black" onclick="exportCards()">导出字卡</button><input type="file" id="importCardInput" accept=".json" style="display:none" onchange="handleImportCards(event)"></div>
+    </div>
+  </div>
+
+  <!-- 状态 -->
+  <div class="screen page" id="pageStatusList">
+    <div class="page-header"><button class="back-btn" onclick="navigateTo('pageDreamRole')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><h2>状态设置</h2></div>
+    <div class="page-body">
+      <div class="card-toolbar"><div class="card-toolbar-row"><button class="btn-black" onclick="openAddStatusModal()">+ 添加状态</button><button class="btn-black" onclick="addStatusCategoryPrompt()">+ 新建分类</button><button class="btn-black" onclick="dedupeStatuses()">去重</button></div><input class="card-search" type="text" id="statusSearchInput" placeholder="搜索状态内容..." oninput="onStatusSearch(this.value)"></div>
+      <div class="card-list-container" id="statusListContainer"></div>
+      <div class="card-toolbar-row" style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;"><button class="btn-black" onclick="document.getElementById('importStatusInput').click()">导入状态</button><button class="btn-black" onclick="exportStatuses()">导出状态</button><input type="file" id="importStatusInput" accept=".json" style="display:none" onchange="handleImportStatuses(event)"></div>
+    </div>
+  </div>
+
+  <!-- 梦角 -->
+  <div class="screen page" id="pageDreamRole">
+    <div class="page-header"><button class="back-btn" onclick="navigateTo('screenMain')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><h2>梦角设置</h2><div style="display: flex; gap: 8px;"><button class="btn-black" style="padding: 8px 12px; font-size: 12px;" onclick="openDreamEditModal()">+ 添加</button><button class="btn-black" style="padding: 8px 12px; font-size: 12px;" onclick="navigateTo('pageStatusList')">状态</button></div></div>
+    <div class="page-body"><div class="card-list-container" id="dreamListContainer" style="padding: 0;"></div>
+   </div>
+  </div>
+
+  <!-- 暗号 -->
+  <div class="screen page" id="pageSecretCode">
+    <div class="page-header"><button class="back-btn" onclick="window.goBack()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><h2>暗号</h2></div>
+    <div class="page-body" style="padding: 16px; display: flex; flex-direction: column;">
+      <div class="secret-draw-area"><div class="secret-result" id="secretResult">点击下方按钮对暗号</div><button class="btn-black" id="drawSecretBtn" style="width: 100%; margin-top: 16px; padding: 14px; font-size: 15px;" onclick="drawSecret()">对暗号</button></div>
+      <div class="card-toolbar" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;"><div class="card-toolbar-row" style="justify-content: space-between; align-items: center; margin-bottom: 8px;"><span style="font-size: 13px; color: var(--gray);">共有 10 个暗号位，点击右侧铅笔编辑</span></div></div>
+      <div class="card-list-container" id="secretListContainer" style="flex: 1; overflow-y: auto;"></div>
+    </div>
+  </div>
+
+  <!-- 拍一拍管理 -->
+  <div class="screen page" id="pagePokes">
+    <div class="page-header"><button class="back-btn" onclick="window.goBack()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><h2>拍一拍设置</h2></div>
+    <div class="page-body">
+      <div class="card-toolbar"><div class="card-toolbar-row"><button class="btn-black" onclick="openAddPokeModal()">+ 添加拍一拍</button><button class="btn-black" onclick="addPokeCategoryPrompt()">+ 新建分类</button><button class="btn-black" onclick="dedupePokes()">去重</button></div><input class="card-search" type="text" id="pokeSearchInput" placeholder="搜索拍一拍文案..." oninput="onPokeSearch(this.value)"></div>
+      <div class="card-list-container" id="pokeListContainer"></div>
+      <div class="card-toolbar-row" style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;"><button class="btn-black" onclick="document.getElementById('importPokeInput').click()">导入</button><button class="btn-black" onclick="exportPokes()">导出</button><input type="file" id="importPokeInput" accept=".json" style="display:none" onchange="handleImportPokes(event)"></div>
+    </div>
+  </div>
+
+  <!-- 日记主界面 -->
+  <div class="screen page" id="pageDiary">
+    <div class="page-header">
+      <button class="back-btn" onclick="navigateTo('screenMain')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2>日记</h2>
+      <button class="btn-black" style="padding: 8px 12px; font-size: 12px;" onclick="openWriteDiary()">+ 写日记</button>
+    </div>
+    <div class="page-body" style="padding:0; overflow-y:auto;">
+      <div class="diary-cover" id="diaryCover" style="height:180px; background:linear-gradient(135deg,#a8c8e0,#7ec8e3);" onclick="document.getElementById('diaryCoverInput').click()">
+        <input type="file" id="diaryCoverInput" accept="image/*" style="display:none" onchange="handleDiaryCoverUpload(event)">
+      </div>
+      <div class="diary-list" id="diaryList" style="padding:16px;"></div>
+    </div>
+  </div>
+
+  <!-- 写日记界面 -->
+  <div class="screen page" id="pageWriteDiary">
+    <div class="page-header">
+      <button class="back-btn" onclick="navigateTo('pageDiary')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2>写日记</h2>
+      <button class="btn-black" style="padding: 8px 12px; font-size: 12px;" onclick="saveDiary()">保存</button>
+    </div>
+    <div class="page-body">
+      <div class="form-group" style="margin-bottom:16px;"><label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">今天心情</label><div id="diaryMoodTags" style="display:flex;gap:8px;overflow-x:auto;padding:4px 0;"></div></div>
+      <div class="form-group" style="margin-bottom:16px;"><label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">今天天气</label><div id="diaryWeatherTags" style="display:flex;gap:8px;overflow-x:auto;padding:4px 0;"></div></div>
+      <div class="form-group"><label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">写点什么吧</label><textarea id="diaryTextInput" class="add-card-textarea" placeholder="今天想说点什么……" style="min-height:150px;"></textarea></div>
+    </div>
+  </div>
+
+  <!-- 信箱主界面 -->
+  <div class="screen page" id="pageMailbox">
+    <div class="page-header">
+      <button class="back-btn" onclick="navigateTo('screenMain')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2>信箱</h2>
+      <button class="btn-black" style="padding: 8px 12px; font-size: 12px;" onclick="openWriteLetter()">+ 写信</button>
+    </div>
+    <div style="display:flex;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;">
+      <div onclick="switchMailTab('inbox')" id="mailTabInbox" style="flex:1;text-align:center;padding:12px;font-size:14px;font-weight:600;color:var(--blue);border-bottom:2px solid var(--blue);cursor:pointer;position:relative;">收信箱<span id="mailUnreadBadge" style="display:none;position:absolute;top:6px;right:25%;background:#ff3b30;color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;">0</span></div>
+      <div onclick="switchMailTab('outbox')" id="mailTabOutbox" style="flex:1;text-align:center;padding:12px;font-size:14px;font-weight:600;color:var(--gray);border-bottom:2px solid transparent;cursor:pointer;">发信箱</div>
+    </div>
+    <div class="page-body" style="padding:0;"><div id="mailList" style="display:flex;flex-direction:column;"></div></div>
+  </div>
+
+  <!-- 写信界面 -->
+  <div class="screen page" id="pageWriteLetter">
+    <div class="page-header">
+      <button class="back-btn" onclick="navigateTo('pageMailbox')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2>写信</h2>
+      <button class="btn-black" style="padding: 8px 12px; font-size: 12px;" onclick="sendLetter()">发送</button>
+    </div>
+    <div class="page-body">
+      <div class="form-group"><label style="font-size:13px;color:var(--gray);display:block;margin-bottom:4px;">收信人</label><select id="letterTarget" class="add-card-select"></select></div>
+      <div class="form-group"><label style="font-size:13px;color:var(--gray);display:block;margin-bottom:4px;">信件内容</label><textarea id="letterContent" class="add-card-textarea" placeholder="想对TA说些什么……" style="min-height:200px;"></textarea></div>
+    </div>
+  </div>
+
+  <!-- 信件详情界面 -->
+  <div class="screen page" id="pageLetterDetail">
+    <div class="page-header">
+      <button class="back-btn" onclick="navigateTo('pageMailbox')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2 id="letterDetailTitle">信件</h2>
+    </div>
+    <div class="page-body" id="letterDetailContent"></div>
+  </div>
+
+  <!-- 通话悬浮窗 -->
+  <div class="call-overlay" id="callOverlay">
+    <div class="call-card">
+            <button class="btn-black" id="minimizeBtn" onclick="minimizeCall()" style="position: absolute; top: 14px; right: 14px; padding: 4px 10px; font-size: 12px;">缩小</button>
+      <div class="call-avatar" id="callAvatar">梦</div>
+      <div class="call-name" id="callName">梦角</div>
+      <div class="call-status" id="callStatus">正在呼叫...</div>
+      <div class="call-timer" id="callTimer">00:00</div>
+      <div class="call-buttons">
+        <button class="btn-black" id="hangupBtn" onclick="hangupCall()" style="background: rgba(255,59,48,0.9);">挂断</button>
+        <button class="btn-black" id="answerBtn" onclick="answerCall()" style="display: none;">接听</button>
+      </div>
+    </div>
+  </div>
+       <div class="call-mini" id="callMini">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    <span class="mini-time" id="miniTime">00:00</span>
+  </div>
+
+    <!-- 美化界面 -->
+  <div class="screen page" id="pageBeautify">
+    <div class="page-header">
+      <button class="back-btn" onclick="navigateTo('screenMain')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2>美化</h2>
+    </div>
+    <div class="page-body">
+      <!-- 主页面背景 -->
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">主页面背景</label>
+        <div style="display:flex;gap:8px;">
+<button class="btn-black" style="flex:1; background: var(--card); color: var(--text); border: 1px solid var(--border);" onclick="document.getElementById('beautifyHomeBgInput').click()">选择图片</button>
+<button class="btn-black" style="width:80px; background: var(--card); color: var(--text); border: 1px solid var(--border);" onclick="resetHomeBg()">清除</button>
+        </div>
+        <input type="file" id="beautifyHomeBgInput" accept="image/*" style="display:none" onchange="handleBeautifyHomeBg(event)">
+      </div>
+
+      <!-- 纸条背景 -->
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">纸条背面样式（图片）</label>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-black" style="flex:1; background: var(--card); color: var(--text); border: 1px solid var(--border);" onclick="document.getElementById('beautifyPaperInput').click()">选择图片</button>
+<button class="btn-black" style="width:80px; background: var(--card); color: var(--text); border: 1px solid var(--border);" onclick="resetPaperBg()">清除</button>
+        </div>
+        <input type="file" id="beautifyPaperInput" accept="image/*" style="display:none" onchange="handleBeautifyPaper(event)">
+      </div>
+
+      <!-- 图标自定义 -->
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">图标自定义</label>
+        <div id="iconCustomList" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+
+      <!-- 全局字体颜色 -->
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">全局字体颜色</label>
+        <input type="color" id="beautifyFontColor" style="width:100%;height:40px;border:1px solid var(--border);border-radius:8px;padding:2px;cursor:pointer;" value="#1d1d1f" onchange="applyFontColor(this.value)">
+      </div>
+
+      <!-- 全局字体大小 -->
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">全局字体大小 (8px ~ 20px)</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="range" id="beautifyFontSize" min="8" max="20" step="1" value="14" style="flex:1;" oninput="applyFontSize(this.value)">
+          <span id="beautifyFontSizeVal" style="font-size:14px;color:var(--text);width:30px;text-align:right;">14</span>
+        </div>
+      </div>
+
+      <!-- 主题颜色 -->
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">主题颜色（图标/按钮颜色）</label>
+        <input type="color" id="beautifyThemeColor" style="width:100%;height:40px;border:1px solid var(--border);border-radius:8px;padding:2px;cursor:pointer;" value="#007aff" onchange="applyThemeColor(this.value)">
+      </div>
+    </div>
+
+          <!-- 按钮区域 -->
+      <div style="display:flex; gap:10px; margin-top:24px; border-top:1px solid var(--border); padding-top:16px;">
+       <button class="btn-black" style="flex:1; background: var(--card); color: var(--text); border: 1px solid var(--border);" onclick="saveBeautifySettingsFromUI()">保存</button>
+        <button class="btn-black" style="flex:1; background: rgba(255,59,48,0.9);" onclick="resetBeautifySettingsFromUI()">恢复默认</button>
+      </div>
+  </div>
+
+    <!-- 设置界面 -->
+  <div class="screen page" id="pageSettings">
+    <div class="page-header">
+      <button class="back-btn" onclick="navigateTo('screenMain')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2>设置</h2>
+    </div>
+    <div class="page-body">
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--gray);display:block;margin-bottom:6px;">抽取纸条动画延迟（秒）</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="number" id="settingMinDelay" step="0.1" min="0.1" value="1.2" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);outline:none;">
+          <span style="color:var(--gray);">~</span>
+          <input type="number" id="settingMaxDelay" step="0.1" min="0.1" value="1.2" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);outline:none;">
+        </div>
+        <button class="btn-black" style="margin-top:10px;width:100%;" onclick="saveDelaySetting()">保存延迟设置</button>
+      </div>
+      <div class="card-toolbar" style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+        <button class="btn-black" style="width:100%;margin-bottom:10px;" onclick="backupData()">备份数据</button>
+        <button class="btn-black" style="width:100%;margin-bottom:10px;" onclick="document.getElementById('restoreInput').click()">从备份导入</button>
+        <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreData(event)">
+        <button class="btn-black" style="width:100%;background:rgba(255,59,48,0.9);" onclick="clearAllData()">清除所有数据</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗们 -->
+  <div class="add-card-modal" id="dreamEditModal">
+    <div class="add-card-box">
+      <div class="add-card-header"><span id="dreamEditTitle">添加梦角</span><button class="close-btn" onclick="closeDreamEditModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+      <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 16px;"><div class="avatar-circle" id="dreamEditAvatarPreview" style="width: 64px; height: 64px; font-size: 24px; margin-bottom: 8px; cursor: pointer; background-size: cover;" onclick="document.getElementById('dreamAvatarInput').click()">+</div><input type="file" id="dreamAvatarInput" accept="image/*" style="display: none;" onchange="handleDreamAvatarUpload(event)"><span style="font-size: 12px; color: var(--gray);">点击上传头像</span></div>
+      <div class="form-group" style="margin-bottom: 16px;"><label style="font-size: 12px; color: var(--gray); display: block; margin-bottom: 4px;">名字</label><input type="text" id="dreamEditName" placeholder="输入名字" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); outline: none; box-sizing: border-box;"></div>
+      <div class="add-card-footer"><button class="btn-black" style="flex:1;" onclick="closeDreamEditModal()">取消</button><button class="btn-black" style="flex:1;" onclick="saveDreamEdit()">保存</button></div>
+    </div>
+  </div>
+  <div class="add-card-modal" id="addStatusModal">
+    <div class="add-card-box">
+      <div class="add-card-header"><span>添加状态</span><button class="close-btn" onclick="closeAddStatusModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+      <select id="addStatusCatSelect" class="add-card-select"></select>
+      <textarea id="addStatusTextInput" class="add-card-textarea" placeholder="输入状态，批量添加请每行一条..."></textarea>
+      <div class="add-card-footer"><button class="btn-black" style="flex:1;" onclick="closeAddStatusModal()">取消</button><button class="btn-black" style="flex:1;" onclick="confirmAddStatus()">保存</button></div>
+    </div>
+  </div>
+  <div class="add-card-modal" id="addCardModal">
+    <div class="add-card-box">
+      <div class="add-card-header"><span>添加字卡</span><button class="close-btn" onclick="closeAddCardModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+      <select id="addCardCatSelect" class="add-card-select"></select>
+      <textarea id="addCardTextInput" class="add-card-textarea" placeholder="输入字卡，批量添加请每行一条..."></textarea>
+      <div class="add-card-footer"><button class="btn-black" style="flex:1;" onclick="closeAddCardModal()">取消</button><button class="btn-black" style="flex:1;" onclick="confirmAddCard()">保存</button></div>
+    </div>
+  </div>
+  <div class="add-card-modal" id="historyCardModal">
+    <div class="add-card-box">
+      <div class="add-card-header"><span>完整字卡内容</span><button class="close-btn" onclick="closeHistoryCardModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+      <div id="historyCardModalContent" style="font-size: 15px; line-height: 1.7; color: var(--text); word-break: break-word; max-height: 50vh; overflow-y: auto; padding: 10px 0;">暂无内容</div>
+      <div class="add-card-footer"><button class="btn-black" style="flex:1;" onclick="closeHistoryCardModal()">关闭</button></div>
+    </div>
+  </div>
+  <div class="add-card-modal" id="addSecretModal">
+    <div class="add-card-box">
+      <div class="add-card-header"><span id="secretModalTitle">编辑暗号</span><button class="close-btn" onclick="closeAddSecretModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+      <textarea id="secretInput" class="add-card-textarea" placeholder="输入暗号内容，留空则代表未设置..."></textarea>
+      <div class="add-card-footer"><button class="btn-black" style="flex:1;" onclick="closeAddSecretModal()">取消</button><button class="btn-black" style="flex:1;" onclick="saveSecretEdit()">保存</button></div>
+    </div>
+  </div>
+  <div class="add-card-modal" id="addPokeModal">
+    <div class="add-card-box">
+      <div class="add-card-header"><span>添加拍一拍</span><button class="close-btn" onclick="closeAddPokeModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+      <select id="addPokeCatSelect" class="add-card-select"></select>
+      <textarea id="addPokeTextInput" class="add-card-textarea" placeholder="输入拍一拍文案，批量添加请每行一条...&#10;例如：拍了拍你"></textarea>
+      <div class="add-card-footer"><button class="btn-black" style="flex:1;" onclick="closeAddPokeModal()">取消</button><button class="btn-black" style="flex:1;" onclick="confirmAddPoke()">保存</button></div>
+    </div>
+  </div>
+  <div class="add-card-modal" id="choiceModal">
+    <div class="add-card-box">
+      <div class="add-card-header"><span>抉择</span><button class="close-btn" onclick="closeChoiceModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+      <input type="text" id="choiceQuestionInput" class="add-card-select" placeholder="输入问题..." style="margin-bottom: 8px;">
+      <div id="choiceOptionsContainer" style="max-height: 40vh; overflow-y: auto; margin-bottom: 8px;"></div>
+      <button class="btn-black" onclick="addChoiceOption()" style="margin-bottom: 16px; font-size: 12px; padding: 6px;">+ 添加选项（2~10个）</button>
+      <div class="add-card-footer"><button class="btn-black" style="flex:1;" onclick="closeChoiceModal()">取消</button><button class="btn-black" style="flex:1;" onclick="sendChoice()">发送</button></div>
+    </div>
+  </div>
+</div>
+<script src="main.js"></script>
+</body>
+</html>

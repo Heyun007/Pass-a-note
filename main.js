@@ -1103,14 +1103,12 @@ window.applyTarotBgs = function() {
 
 window.openTarotPlus = function() {
   if (tarotState.mode === 'song') {
-    if (!songState.loggedIn) return alert('请先登录网易云！');
-    window.showSongPlaylist();
+    showToast('内置歌单共 ' + BUILTIN_SONGS.length + ' 首歌，直接发送即可抽歌');
   } else {
     window.navigateTo('pageTarotLibrary');
     setTimeout(function() { window.renderTarotGroupList(); }, 0);
   }
 };
-
 window.closeTarotPlus = function() {
   window.navigateTo('pageTarot');
 };

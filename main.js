@@ -242,10 +242,13 @@ if (pageTarotSettings) pageTarotSettings.classList.remove('active');
   };
 
   window.backupData = function() {
-    var data = { cards: cardState, statuses: statusState, dreams: dreamState, history: historyState, chatRound: chatRoundState, secrets: secretState, pokes: pokeState, diaries: diaryState, mails: mailState, settings: appSettings };
-    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '小纸条_备份_' + new Date().toISOString().slice(0, 10) + '.json';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast('备份文件已下载');
+  var data = {
+    cards: cardState, statuses: statusState, dreams: dreamState,
+    history: historyState, chatRound: chatRoundState, secrets: secretState,
+    pokes: pokeState, diaries: diaryState, mails: mailState,
+    settings: appSettings,
+    tarotState: tarotState, // 新增：备份感知页数据（图片库/背景）
+    tarotPlaylistId: localStorage.getItem('tarotPlaylistId') || null // 新增：备份歌单ID
   };
 
   window.restoreData = function(e) {
@@ -254,7 +257,7 @@ if (pageTarotSettings) pageTarotSettings.classList.remove('active');
     reader.onload = function(ev) {
       try {
         var data = JSON.parse(ev.target.result);
-        var promises = [];
+               var promises = [];
         if (data.cards) promises.push(dbSet('passANoteCards', data.cards));
         if (data.statuses) promises.push(dbSet('passANoteStatuses', data.statuses));
         if (data.dreams) promises.push(dbSet('passANoteDreams', data.dreams));
@@ -265,6 +268,14 @@ if (pageTarotSettings) pageTarotSettings.classList.remove('active');
         if (data.diaries) promises.push(dbSet('passANoteDiaries', data.diaries));
         if (data.mails) promises.push(dbSet('passANoteMails', data.mails));
         if (data.settings) { appSettings = data.settings; saveAppSettings(); }
+        
+        // 新增：恢复感知页数据
+        if (data.tarotState) promises.push(dbSet('passANoteTarot', data.tarotState));
+        if (data.tarotPlaylistId) {
+          try { localStorage.setItem('tarotPlaylistId', data.tarotPlaylistId); } catch(e) {}
+        } else if (data.tarotPlaylistId === null) {
+          try { localStorage.removeItem('tarotPlaylistId'); } catch(e) {}
+        }
         Promise.all(promises).then(function() { alert('数据已成功导入，页面即将刷新'); location.reload(); }).catch(function(err) { alert('导入失败：' + err.message); });
       } catch(err) { alert('文件解析失败，请确认是有效的备份文件'); }
     };

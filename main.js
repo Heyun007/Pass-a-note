@@ -2593,9 +2593,6 @@ window.seekSong = function(val) {
   updateProgressUI();
 };
 
-// 启动时加载保存的歌单
-window.loadSavedPlaylist();
-
   function sendBackgroundNotification(title, body) {
   // 如果网页在前台，就不弹系统通知了，免得吵到用户
   if (!document.hidden) return;

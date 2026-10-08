@@ -1229,22 +1229,14 @@ window.tarotSend = function() {
     if (!text) return;
     var dreamId = dreamState.currentId;
     if (!dreamId) return alert('请先选择一个梦角！');
-
     var allImages = [];
-    tarotState.groups.forEach(function(g) {
-      g.images.forEach(function(i) { allImages.push(i); });
-    });
-    if (allImages.length === 0) {
-      alert('图片库是空的，请先点 + 号添加图片');
-      return;
-    }
-
+    tarotState.groups.forEach(function(g) { g.images.forEach(function(i) { allImages.push(i); }); });
+    if (allImages.length === 0) return alert('图片库是空的');
     var grid = document.getElementById('tarotGrid');
     var promptEl = document.getElementById('tarotPrompt');
     var loading = document.getElementById('tarotLoading');
     var loadingText = document.getElementById('tarotLoadingText');
-    var voiceText = '';
-    var normalText = '';
+    var voiceText = '', normalText = '';
     if (tarotVoiceState.duration > 0) {
       voiceText = '🎤 语音 ' + tarotVoiceState.duration + '″';
       tarotVoiceState.duration = 0;
@@ -1256,7 +1248,6 @@ window.tarotSend = function() {
     if (promptEl) promptEl.innerHTML = '';
     if (loadingText) loadingText.textContent = '正在抽取图片……';
     if (loading) loading.style.display = 'flex';
-
     var delay = (3 + Math.random() * 9) * 1000;
     setTimeout(function() {
       var count = 1 + Math.floor(Math.random() * 5);
@@ -1274,38 +1265,60 @@ window.tarotSend = function() {
     return;
   }
 
-  // ===== 传歌模式 =====
+  // ====== 传歌模式（内置歌单版） ======
   var input2 = document.getElementById('tarotInput');
   if (!input2) return;
   var text2 = input2.value.trim();
   if (!text2) return;
-  input2.value = '';
 
-  var playerContainer = document.getElementById('myPlayer');
-  if (!playerContainer) {
-    alert('找不到播放器容器！请检查 index.html 里有没有 id="myPlayer"');
-    return;
+  // 检查内置歌单是否为空
+  if (typeof BUILTIN_SONGS === 'undefined' || !BUILTIN_SONGS || BUILTIN_SONGS.length === 0) {
+    return alert('内置歌单还没有配置，请去 main.js 里配置 BUILTIN_SONGS');
   }
 
-  playerContainer.innerHTML = '<div style="text-align:center; padding:40px; font-size:13px; color:var(--gray);">' +
-    '<svg class="spinner" viewBox="0 0 50 50" style="width:30px; height:30px;"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle></svg>' +
-    '<div style="margin-top:10px;">正在抽取歌曲中……</div>' +
-    '</div>';
+  input2.value = '';
 
-  var delay2 = 8000 + Math.random() * 22000;
+  var lyricsEl = document.getElementById('lyricsContainer');
+  var lyricsContent = document.getElementById('lyricsContent');
+  var vinylWrapper = document.getElementById('vinylWrapper');
+  var progressWrapper = document.getElementById('progressWrapper');
+  if (vinylWrapper) vinylWrapper.style.display = 'none';
+  if (progressWrapper) progressWrapper.style.display = 'none';
+  if (lyricsEl) lyricsEl.style.display = 'block';
+  var songPromptEl = document.getElementById('songPrompt');
+  if (songPromptEl) songPromptEl.innerHTML = '你说：<span>' + escapeHtml(text2) + '</span>';
+  if (lyricsContent) lyricsContent.innerHTML = '<div style="text-align:center; padding:40px; font-size:13px; color:var(--gray);"><svg class="spinner" viewBox="0 0 50 50" style="width:30px; height:30px;"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle></svg><div style="margin-top:10px;">正在抽取歌曲中……</div></div>';
+
+  // 假装等待 2-5 秒
+  var delay2 = 2000 + Math.random() * 3000;
   setTimeout(function() {
-    var playlistId = '3778678'; // 网易云热歌榜，可改成你自己的歌单 ID
-    playerContainer.innerHTML = '<meting-js server="netease" type="playlist" id="' + playlistId + '" fixed="false" autoplay="false" preload="auto" mutex="true" list-folded="false" list-max-height="0" theme="#007aff"></meting-js>';
+    // 从内置歌单随机抽一首
+    var randomTrack = BUILTIN_SONGS[Math.floor(Math.random() * BUILTIN_SONGS.length)];
+    songState.currentSong = randomTrack;
 
-    setTimeout(function() {
-      var audio = document.querySelector('audio');
-      if (audio) {
-        audio.currentTime = 10 + Math.floor(Math.random() * 120);
-        audio.pause();
-      }
-    }, 1500);
+    if (vinylWrapper) vinylWrapper.style.display = 'flex';
+    if (progressWrapper) progressWrapper.style.display = 'flex';
+    var coverEl = document.getElementById('vinylCover');
+    if (coverEl) coverEl.style.backgroundImage = 'url(' + randomTrack.cover + ')';
 
-    showToast('抽到了歌曲，点击播放即可欣赏');
+    // 直接播放内置链接
+    songState.audio.src = randomTrack.url;
+    songState.audio.onloadedmetadata = function() {
+      var duration = songState.audio.duration || 0;
+      var randomTime = Math.random() * duration * 0.8;
+      songState.audio.currentTime = randomTime;
+      songState.audio.pause();
+      updateProgressUI();
+      showToast('抽到了：' + randomTrack.name + ' - ' + randomTrack.artist);
+    };
+    songState.audio.ontimeupdate = updateProgressUI;
+    songState.audio.onended = function() {
+      var disc = document.getElementById('vinylDisc');
+      if (disc) disc.style.animationPlayState = 'paused';
+      songState.isPlaying = false;
+    };
+    // 既然没歌词，把歌词区清空
+    if (lyricsContent) lyricsContent.innerHTML = '<div style="text-align:center; padding:40px; font-size:13px; color:var(--gray);">暂无歌词，点击播放欣赏</div>';
   }, delay2);
 };
 

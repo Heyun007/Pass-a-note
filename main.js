@@ -61,8 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
     groups: [{ id: 'default', name: '默认', images: [] }],
     mode: 'image',
     rounds: {},
-    imageBg: null,
-    songBg: null
+    imageBg: null
   };
   var chatState = {
     messages: {},
@@ -97,25 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var isDataReady = false;
 
-  // ========== 内置歌单 ==========
-  var BUILTIN_SONGS = [
-    {
-      name: 'shut up My Moms Calling (stereophony)',
-      artist: 'TiTi',
-      cover: 'https://p1.music.126.net/MOVXSsnR9TLPrto25FZ6-Q==/109951173114466125.jpg?param=500y500',
-      url: 'https://music.163.com/song/media/outer/url?id=3374262801.mp3'
-    }
-    // 想加歌，就在上一首的 } 后加英文逗号，再粘贴一首 { name, artist, cover, url }
-  ];
-
-  // 播放器状态（被传歌模式、进度条、播放按钮共用）
-  var songState = {
-    currentSong: null,
-    audio: new Audio(),
-    lyrics: [],
-    isPlaying: false
-  };
-
   function initSecretSlots() {
     var newCodes = [];
     for (var i = 0; i < 10; i++) {
@@ -148,10 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (results[11]) chatSettings = Object.assign(chatSettings, results[11] || {});
     if (results[12]) {
       tarotState.groups = results[12].groups || tarotState.groups;
-      tarotState.mode = results[12].mode || 'image';
+      tarotState.mode = 'image';
       tarotState.rounds = results[12].rounds || {};
       tarotState.imageBg = results[12].imageBg || null;
-      tarotState.songBg = results[12].songBg || null;
     }
     initSecretSlots();
     saveSecretState();
@@ -163,11 +142,20 @@ document.addEventListener('DOMContentLoaded', function() {
     renderChatRound();
     window.renderPokeManager();
     if (pageHistory && pageHistory.classList.contains('active')) window.initHistoryPage();
+    hideSongTab();
   }).catch(function(e) {
     console.error('数据加载失败', e);
     showToast('数据加载失败，请刷新重试', true);
     isDataReady = true;
   });
+
+  // 隐藏传歌 tab，避免用户点进空界面
+  function hideSongTab() {
+    var t = document.getElementById('tarotTabSong');
+    if (t) t.style.display = 'none';
+    var bar = document.getElementById('tarotBottomBar');
+    if (bar) bar.classList.remove('no-plus');
+  }
 
   function saveCardState() { return dbSet('passANoteCards', cardState); }
   function saveStatusState() { return dbSet('passANoteStatuses', statusState); }
@@ -1305,7 +1293,7 @@ document.addEventListener('DOMContentLoaded', function() {
     sendNotification(d ? d.name : '梦角', '主动找你聊天了');
   }, 60 * 1000);
 
-  // ========== 感知功能 ==========
+  // ========== 感知（仅传图） ==========
   window.renderTarotPage = function() {
     var current = dreamState.dreams.find(function(d) { return d.id === dreamState.currentId; });
     var avatar = document.getElementById('tarotAvatar');
@@ -1317,32 +1305,33 @@ document.addEventListener('DOMContentLoaded', function() {
       name.textContent = current.name || '未命名';
       status.textContent = current.status || '在线';
     }
-    window.applyTarotMode();
-    window.renderTarotRound();
-  };
-  window.applyTarotMode = function() {
-    var mode = tarotState.mode;
+    tarotState.mode = 'image';
     var tabImg = document.getElementById('tarotTabImage');
     var tabSong = document.getElementById('tarotTabSong');
-    if (tabImg) tabImg.classList.toggle('active', mode === 'image');
-    if (tabSong) tabSong.classList.toggle('active', mode === 'song');
-    var bar = document.getElementById('tarotBottomBar');
-    if (bar) { if (mode === 'song') bar.classList.add('no-plus'); else bar.classList.remove('no-plus'); }
-  };
-  window.switchTarotMode = function(mode, silent) {
-    tarotState.mode = mode;
-    if (!silent) saveTarotState();
+    if (tabImg) tabImg.classList.add('active');
+    if (tabSong) tabSong.classList.remove('active');
     var imgMode = document.getElementById('tarotImageMode');
     var songMode = document.getElementById('tarotSongMode');
-    if (mode === 'song') {
-      if (imgMode) imgMode.style.display = 'none';
-      if (songMode) songMode.style.display = 'flex';
-    } else {
-      if (imgMode) imgMode.style.display = 'flex';
-      if (songMode) songMode.style.display = 'none';
-    }
-    window.applyTarotMode();
+    if (imgMode) imgMode.style.display = 'flex';
+    if (songMode) songMode.style.display = 'none';
+    var bar = document.getElementById('tarotBottomBar');
+    if (bar) bar.classList.remove('no-plus');
     window.renderTarotRound();
+  };
+  window.switchTarotMode = function(mode) {
+    if (mode === 'song') {
+      showToast('传歌模式已移除');
+      return;
+    }
+    tarotState.mode = 'image';
+    var tabImg = document.getElementById('tarotTabImage');
+    var tabSong = document.getElementById('tarotTabSong');
+    if (tabImg) tabImg.classList.add('active');
+    if (tabSong) tabSong.classList.remove('active');
+    var imgMode = document.getElementById('tarotImageMode');
+    var songMode = document.getElementById('tarotSongMode');
+    if (imgMode) imgMode.style.display = 'flex';
+    if (songMode) songMode.style.display = 'none';
     window.applyTarotBgs();
   };
   window.renderTarotDreamDropdown = function() {
@@ -1376,7 +1365,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!promptEl || !grid) return;
     var dreamId = dreamState.currentId;
     if (!dreamId) { promptEl.textContent = '请先选择梦角'; grid.className = 'tarot-grid'; grid.innerHTML = ''; return; }
-    if (tarotState.mode !== 'image') { promptEl.innerHTML = ''; grid.className = 'tarot-grid'; grid.innerHTML = ''; return; }
     var round = tarotState.rounds[dreamId];
     if (!round || !round.cards || round.cards.length === 0) {
       promptEl.textContent = '输入一句话，开始抽取图片吧！';
@@ -1419,32 +1407,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     e.target.value = '';
   };
-  window.handleTarotSongBg = function(e) {
-    var file = e.target.files[0]; if (!file) return;
-    compressImage(file, function(dataUrl) {
-      tarotState.songBg = dataUrl;
-      saveTarotState();
-      window.applyTarotBgs();
-      showToast('传歌背景已保存');
-    });
-    e.target.value = '';
-  };
   window.resetTarotImageBg = function() { tarotState.imageBg = null; saveTarotState(); window.applyTarotBgs(); };
-  window.resetTarotSongBg = function() { tarotState.songBg = null; saveTarotState(); window.applyTarotBgs(); };
+  window.resetTarotSongBg = function() { showToast('传歌模式已移除'); };
+  window.handleTarotSongBg = function(e) { if (e && e.target) e.target.value = ''; showToast('传歌模式已移除'); };
   window.applyTarotBgs = function() {
     var page = document.getElementById('pageTarot');
     if (!page) return;
-    var bg = tarotState.mode === 'song' ? tarotState.songBg : tarotState.imageBg;
-    if (bg) page.style.background = 'url(' + bg + ') center/cover no-repeat';
+    if (tarotState.imageBg) page.style.background = 'url(' + tarotState.imageBg + ') center/cover no-repeat';
     else page.style.background = '';
   };
   window.openTarotPlus = function() {
-    if (tarotState.mode === 'song') {
-      showToast('内置歌单共 ' + BUILTIN_SONGS.length + ' 首歌，直接发送即可抽歌');
-    } else {
-      window.navigateTo('pageTarotLibrary');
-      setTimeout(function() { window.renderTarotGroupList(); }, 0);
-    }
+    window.navigateTo('pageTarotLibrary');
+    setTimeout(function() { window.renderTarotGroupList(); }, 0);
   };
   window.closeTarotPlus = function() { window.navigateTo('pageTarot'); };
   window.addTarotGroup = function() {
@@ -1541,99 +1515,47 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     e.target.value = '';
   };
-
-  // ========== 传图 / 传歌 发送 ==========
   window.tarotSend = function() {
-    // ===== 传图模式 =====
-    if (tarotState.mode !== 'song') {
-      var input = document.getElementById('tarotInput');
-      if (!input) return;
-      var text = input.value.trim();
-      if (!text) return;
-      var dreamId = dreamState.currentId;
-      if (!dreamId) return alert('请先选择一个梦角！');
-      var allImages = [];
-      tarotState.groups.forEach(function(g) { g.images.forEach(function(i) { allImages.push(i); }); });
-      if (allImages.length === 0) return alert('图片库是空的');
-      var grid = document.getElementById('tarotGrid');
-      var promptEl = document.getElementById('tarotPrompt');
-      var loading = document.getElementById('tarotLoading');
-      var loadingText = document.getElementById('tarotLoadingText');
-      var voiceText = '', normalText = '';
-      if (tarotVoiceState.duration > 0) {
-        voiceText = '🎤 语音 ' + tarotVoiceState.duration + '″';
-        tarotVoiceState.duration = 0;
-      } else {
-        normalText = text;
-        input.value = '';
-      }
-      if (grid) grid.innerHTML = '';
-      if (promptEl) promptEl.innerHTML = '';
-      if (loadingText) loadingText.textContent = '正在抽取图片……';
-      if (loading) loading.style.display = 'flex';
-      var delay = (3 + Math.random() * 9) * 1000;
-      setTimeout(function() {
-        var count = 1 + Math.floor(Math.random() * 5);
-        var pool = allImages.slice();
-        for (var i = pool.length - 1; i > 0; i--) {
-          var j = Math.floor(Math.random() * (i + 1));
-          var t = pool[i]; pool[i] = pool[j]; pool[j] = t;
-        }
-        var picked = pool.slice(0, Math.min(count, pool.length));
-        tarotState.rounds[dreamId] = { userInput: voiceText || normalText, cards: picked };
-        saveTarotState();
-        if (loading) loading.style.display = 'none';
-        window.renderTarotRound();
-      }, delay);
-      return;
+    var input = document.getElementById('tarotInput');
+    if (!input) return;
+    var text = input.value.trim();
+    if (!text) return;
+    var dreamId = dreamState.currentId;
+    if (!dreamId) return alert('请先选择一个梦角！');
+    var allImages = [];
+    tarotState.groups.forEach(function(g) { g.images.forEach(function(i) { allImages.push(i); }); });
+    if (allImages.length === 0) return alert('图片库是空的');
+    var grid = document.getElementById('tarotGrid');
+    var promptEl = document.getElementById('tarotPrompt');
+    var loading = document.getElementById('tarotLoading');
+    var loadingText = document.getElementById('tarotLoadingText');
+    var voiceText = '', normalText = '';
+    if (tarotVoiceState.duration > 0) {
+      voiceText = '🎤 语音 ' + tarotVoiceState.duration + '″';
+      tarotVoiceState.duration = 0;
+    } else {
+      normalText = text;
+      input.value = '';
     }
-
-    // ===== 传歌模式（内置歌单版） =====
-    var input2 = document.getElementById('tarotInput');
-    if (!input2) return;
-    var text2 = input2.value.trim();
-    if (!text2) return;
-    if (typeof BUILTIN_SONGS === 'undefined' || !BUILTIN_SONGS || BUILTIN_SONGS.length === 0) {
-      return alert('内置歌单还没有配置，请去 main.js 里配置 BUILTIN_SONGS');
-    }
-    input2.value = '';
-    var lyricsEl = document.getElementById('lyricsContainer');
-    var lyricsContent = document.getElementById('lyricsContent');
-    var vinylWrapper = document.getElementById('vinylWrapper');
-    var progressWrapper = document.getElementById('progressWrapper');
-    if (vinylWrapper) vinylWrapper.style.display = 'none';
-    if (progressWrapper) progressWrapper.style.display = 'none';
-    if (lyricsEl) lyricsEl.style.display = 'block';
-    var songPromptEl = document.getElementById('songPrompt');
-    if (songPromptEl) songPromptEl.innerHTML = '你说：<span>' + escapeHtml(text2) + '</span>';
-    if (lyricsContent) lyricsContent.innerHTML = '<div style="text-align:center; padding:40px; font-size:13px; color:var(--gray);"><svg class="spinner" viewBox="0 0 50 50" style="width:30px; height:30px;"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle></svg><div style="margin-top:10px;">正在抽取歌曲中……</div></div>';
-    var delay2 = 2000 + Math.random() * 3000;
+    if (grid) grid.innerHTML = '';
+    if (promptEl) promptEl.innerHTML = '';
+    if (loadingText) loadingText.textContent = '正在抽取图片……';
+    if (loading) loading.style.display = 'flex';
+    var delay = (3 + Math.random() * 9) * 1000;
     setTimeout(function() {
-      var randomTrack = BUILTIN_SONGS[Math.floor(Math.random() * BUILTIN_SONGS.length)];
-      songState.currentSong = randomTrack;
-      if (vinylWrapper) vinylWrapper.style.display = 'flex';
-      if (progressWrapper) progressWrapper.style.display = 'flex';
-      var coverEl = document.getElementById('vinylCover');
-      if (coverEl) coverEl.style.backgroundImage = 'url(' + randomTrack.cover + ')';
-      songState.audio.src = randomTrack.url;
-      songState.audio.onloadedmetadata = function() {
-        var duration = songState.audio.duration || 0;
-        var randomTime = Math.random() * duration * 0.8;
-        songState.audio.currentTime = randomTime;
-        songState.audio.pause();
-        updateProgressUI();
-        showToast('抽到了：' + randomTrack.name + ' - ' + randomTrack.artist);
-      };
-      songState.audio.ontimeupdate = updateProgressUI;
-      songState.audio.onended = function() {
-        var disc = document.getElementById('vinylDisc');
-        if (disc) disc.style.animationPlayState = 'paused';
-        songState.isPlaying = false;
-      };
-      if (lyricsContent) lyricsContent.innerHTML = '<div style="text-align:center; padding:40px; font-size:13px; color:var(--gray);">暂无歌词，点击播放欣赏</div>';
-    }, delay2);
+      var count = 1 + Math.floor(Math.random() * 5);
+      var pool = allImages.slice();
+      for (var i = pool.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = pool[i]; pool[i] = pool[j]; pool[j] = t;
+      }
+      var picked = pool.slice(0, Math.min(count, pool.length));
+      tarotState.rounds[dreamId] = { userInput: voiceText || normalText, cards: picked };
+      saveTarotState();
+      if (loading) loading.style.display = 'none';
+      window.renderTarotRound();
+    }, delay);
   };
-
   safeBind('tarotDreamSelector', 'click', function(e) {
     e.stopPropagation();
     var dd = document.getElementById('tarotDreamDropdown');
@@ -1649,64 +1571,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var el = document.getElementById('tarotImageInput');
     if (el) el.click();
   });
-
-  // 歌词与播放器辅助函数
-  function formatTime(sec) {
-    var m = Math.floor(sec / 60);
-    var s = Math.floor(sec % 60);
-    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-  }
-  function renderLyrics() {
-    var container = document.getElementById('lyricsContent');
-    if (!container) return;
-    if (songState.lyrics.length === 0) { container.innerHTML = '暂无歌词'; return; }
-    var html = '';
-    songState.lyrics.forEach(function(line, index) {
-      html += '<div class="lyric-line" data-index="' + index + '" data-time="' + line.time + '">' + line.text + '</div>';
-    });
-    container.innerHTML = html;
-  }
-  function updateProgressUI() {
-    var audio = songState.audio;
-    var duration = audio.duration || 0;
-    var current = audio.currentTime || 0;
-    var bar = document.getElementById('progressBar');
-    var ct = document.getElementById('currentTime');
-    var tt = document.getElementById('totalTime');
-    if (bar) bar.value = duration ? (current / duration) * 100 : 0;
-    if (ct) ct.textContent = formatTime(current);
-    if (tt) tt.textContent = formatTime(duration);
-    if (songState.lyrics.length > 0) {
-      var lines = document.querySelectorAll('.lyric-line');
-      var activeIndex = -1;
-      for (var i = 0; i < songState.lyrics.length; i++) {
-        if (current >= songState.lyrics[i].time) activeIndex = i;
-        else break;
-      }
-      if (activeIndex >= 0) {
-        lines.forEach(function(l) { l.classList.remove('active-line'); });
-        var al = lines[activeIndex];
-        if (al) { al.classList.add('active-line'); al.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-      }
-    }
-  }
-  window.togglePlay = function() {
-    var disc = document.getElementById('vinylDisc');
-    if (songState.isPlaying) {
-      songState.audio.pause();
-      if (disc) disc.style.animationPlayState = 'paused';
-      songState.isPlaying = false;
-    } else {
-      songState.audio.play();
-      if (disc) disc.style.animationPlayState = 'running';
-      songState.isPlaying = true;
-    }
-  };
-  window.seekSong = function(val) {
-    var duration = songState.audio.duration || 0;
-    songState.audio.currentTime = (val / 100) * duration;
-    updateProgressUI();
-  };
 
   // ========== 抉择逻辑 ==========
   window.openChoiceModal = function() {
@@ -2568,9 +2432,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var dateStr = getDateStr(Date.now());
     if (!historyState[dreamId]) historyState[dreamId] = {};
     if (!historyState[dreamId][dateStr]) historyState[dreamId][dateStr] = [];
-    var minDelay = 2 * 60 * 1000;
-    var maxDelay = 2 * 60 * 1000;
-    var supplementDueAt = Date.now() + Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+    var supplementDueAt = Date.now() + 2 * 60 * 1000;
     historyState[dreamId][dateStr].push({
       id: 'hist_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
       time: Date.now(),

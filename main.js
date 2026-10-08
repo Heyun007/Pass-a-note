@@ -312,12 +312,13 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   window.backupData = function() {
-    var data = {
+       var data = {
       cards: cardState, statuses: statusState, dreams: dreamState,
       history: historyState, chatRound: chatRoundState, secrets: secretState,
       pokes: pokeState, diaries: diaryState, mails: mailState,
       settings: appSettings,
-      tarotState: tarotState
+      tarotState: tarotState,
+      beautify: beautifySettings
     };
     var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     var a = document.createElement('a');
@@ -346,6 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (data.mails) promises.push(dbSet('passANoteMails', data.mails));
         if (data.settings) { appSettings = data.settings; saveAppSettings(); }
         if (data.tarotState) promises.push(dbSet('passANoteTarot', data.tarotState));
+        if (data.beautify) promises.push(dbSet('passANoteBeautify', data.beautify));
         Promise.all(promises).then(function() {
           alert('数据已成功导入，页面即将刷新');
           location.reload();

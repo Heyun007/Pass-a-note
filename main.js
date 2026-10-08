@@ -2375,117 +2375,62 @@ var BUILTIN_SONGS = [
 ];
 // ===============================
 
-// ========== 传歌模式（公开歌单版） ==========
-const API_BASE = 'https://netease-cloud-music-api-backup-five-lime.vercel.app';
-const songState = {
-  playlistId: null,
-  playlist: null,
-  currentSong: null,
-  audio: new Audio(),
-  lyrics: [],
-  isPlaying: false
-};
+  // ====== 传歌模式（内置歌单版） ======
+  var input2 = document.getElementById('tarotInput');
+  if (!input2) return;
+  var text2 = input2.value.trim();
+  if (!text2) return;
 
-// 启动时读取已保存的歌单
-window.loadSavedPlaylist = function() {
-  var savedId = null;
-  try { savedId = localStorage.getItem('tarotPlaylistId'); } catch (e) {}
-  if (savedId) {
-    songState.playlistId = savedId;
-    window.loadPlaylistInfo(savedId, true);
-  } else {
-    var nameEl = document.getElementById('songUsername');
-    if (nameEl) nameEl.textContent = '点击设置歌单';
+  // 检查内置歌单是否为空
+  if (typeof BUILTIN_SONGS === 'undefined' || !BUILTIN_SONGS || BUILTIN_SONGS.length === 0) {
+    return alert('内置歌单还没有配置，请去 main.js 里配置 BUILTIN_SONGS');
   }
-};
 
-// 用户点击顶部栏 → 输入歌单 ID
-window.setupPlaylistId = function() {
-  var current = songState.playlistId || '';
-  var id = prompt(
-    '请输入网易云公开歌单的 ID\n\n怎么找：\n1. 打开网易云网页版或App\n2. 打开你想用的歌单\n3. 点「分享」→「复制链接」\n4. 链接里 id=后面那串数字就是',
-    current
-  );
-  if (!id || !id.trim()) return;
-  var cleanId = id.trim().replace(/\D/g, '');
-  if (!cleanId) return alert('歌单 ID 只能是数字');
-  window.loadPlaylistInfo(cleanId, false);
-};
+  input2.value = '';
 
-// 拉取歌单信息
-window.loadPlaylistInfo = async function(playlistId, silent) {
-  var nameEl = document.getElementById('songUsername');
-  var avatarEl = document.getElementById('songAvatar');
-  if (nameEl) nameEl.textContent = '加载中…';
-  try {
-    const res = await fetch(`${API_BASE}/playlist/detail?id=${playlistId}&timestamp=${Date.now()}`);
-    const data = await res.json();
-    if (!data.playlist) {
-      if (nameEl) nameEl.textContent = '点击设置歌单';
-      if (!silent) alert('获取歌单失败，请检查 ID 是否正确');
-      return;
-    }
-    songState.playlistId = playlistId;
-    songState.playlist = data.playlist;
-    try { localStorage.setItem('tarotPlaylistId', playlistId); } catch (e) {}
-    if (nameEl) nameEl.textContent = data.playlist.name + '（' + data.playlist.tracks.length + '首）';
-    if (avatarEl && data.playlist.coverImgUrl) {
-      avatarEl.style.backgroundImage = 'url(' + data.playlist.coverImgUrl + ')';
-      avatarEl.style.backgroundSize = 'cover';
-      avatarEl.textContent = '';
-    }
-    if (!silent) showToast('歌单已保存');
-  } catch (e) {
-    if (nameEl) nameEl.textContent = '点击设置歌单';
-    if (!silent) alert('网络错误：' + e.message);
-  }
-};
+  var lyricsEl = document.getElementById('lyricsContainer');
+  var lyricsContent = document.getElementById('lyricsContent');
+  var vinylWrapper = document.getElementById('vinylWrapper');
+  var progressWrapper = document.getElementById('progressWrapper');
+  if (vinylWrapper) vinylWrapper.style.display = 'none';
+  if (progressWrapper) progressWrapper.style.display = 'none';
+  if (lyricsEl) lyricsEl.style.display = 'block';
+  var songPromptEl = document.getElementById('songPrompt');
+  if (songPromptEl) songPromptEl.innerHTML = '你说：<span>' + escapeHtml(text2) + '</span>';
+  if (lyricsContent) lyricsContent.innerHTML = '<div style="text-align:center; padding:40px; font-size:13px; color:var(--gray);"><svg class="spinner" viewBox="0 0 50 50" style="width:30px; height:30px;"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle></svg><div style="margin-top:10px;">正在抽取歌曲中……</div></div>';
 
-// 发消息抽歌
-window.tarotSend = function() {
-  // 传图模式走原逻辑
-  if (tarotState.mode !== 'song') {
-    var input = document.getElementById('tarotInput');
-    if (!input) return;
-    var text = input.value.trim();
-    if (!text) return;
-    var dreamId = dreamState.currentId;
-    if (!dreamId) return alert('请先选择一个梦角！');
-    var allImages = [];
-    tarotState.groups.forEach(function(g) { g.images.forEach(function(i) { allImages.push(i); }); });
-    if (allImages.length === 0) return alert('图片库是空的');
-    var grid = document.getElementById('tarotGrid');
-    var promptEl = document.getElementById('tarotPrompt');
-    var loading = document.getElementById('tarotLoading');
-    var loadingText = document.getElementById('tarotLoadingText');
-    var voiceText = '', normalText = '';
-    if (tarotVoiceState.duration > 0) {
-      voiceText = '🎤 语音 ' + tarotVoiceState.duration + '″';
-      tarotVoiceState.duration = 0;
-    } else {
-      normalText = text;
-      input.value = '';
-    }
-    if (grid) grid.innerHTML = '';
-    if (promptEl) promptEl.innerHTML = '';
-    if (loadingText) loadingText.textContent = '正在抽取图片……';
-    if (loading) loading.style.display = 'flex';
-    var delay = (3 + Math.random() * 9) * 1000;
-    setTimeout(function() {
-      var count = 1 + Math.floor(Math.random() * 5);
-      var pool = allImages.slice();
-      for (var i = pool.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var t = pool[i]; pool[i] = pool[j]; pool[j] = t;
-      }
-      var picked = pool.slice(0, Math.min(count, pool.length));
-      tarotState.rounds[dreamId] = { userInput: voiceText || normalText, cards: picked };
-      saveTarotState();
-      if (loading) loading.style.display = 'none';
-      window.renderTarotRound();
-    }, delay);
-    return;
-  }
+  // 假装等待 2-5 秒
+  var delay2 = 2000 + Math.random() * 3000;
+  setTimeout(function() {
+    // 从内置歌单随机抽一首
+    var randomTrack = BUILTIN_SONGS[Math.floor(Math.random() * BUILTIN_SONGS.length)];
+    songState.currentSong = randomTrack;
+
+    if (vinylWrapper) vinylWrapper.style.display = 'flex';
+    if (progressWrapper) progressWrapper.style.display = 'flex';
+    var coverEl = document.getElementById('vinylCover');
+    if (coverEl) coverEl.style.backgroundImage = 'url(' + randomTrack.cover + ')';
+
+    // 直接播放内置链接
+    songState.audio.src = randomTrack.url;
+    songState.audio.onloadedmetadata = function() {
+      var duration = songState.audio.duration || 0;
+      var randomTime = Math.random() * duration * 0.8;
+      songState.audio.currentTime = randomTime;
+      songState.audio.pause();
+      updateProgressUI();
+      showToast('抽到了：' + randomTrack.name + ' - ' + randomTrack.artist);
+    };
+    songState.audio.ontimeupdate = updateProgressUI;
+    songState.audio.onended = function() {
+      var disc = document.getElementById('vinylDisc');
+      if (disc) disc.style.animationPlayState = 'paused';
+      songState.isPlaying = false;
+    };
+    // 既然没歌词，把歌词区清空
+    if (lyricsContent) lyricsContent.innerHTML = '<div style="text-align:center; padding:40px; font-size:13px; color:var(--gray);">暂无歌词，点击播放欣赏</div>';
+  }, delay2);
+};
 
   // ====== 传歌模式 ======
   var input2 = document.getElementById('tarotInput');

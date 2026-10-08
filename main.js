@@ -149,10 +149,10 @@ document.addEventListener('DOMContentLoaded', function() {
     isDataReady = true;
   });
 
-  // 隐藏传歌 tab，避免用户点进空界面
+  // 隐藏模式切换栏（现在只有传图模式）
   function hideSongTab() {
-    var t = document.getElementById('tarotTabSong');
-    if (t) t.style.display = 'none';
+    var tabs = document.querySelector('.tarot-mode-tabs');
+    if (tabs) tabs.style.display = 'none';
     var bar = document.getElementById('tarotBottomBar');
     if (bar) bar.classList.remove('no-plus');
   }
@@ -1397,14 +1397,14 @@ document.addEventListener('DOMContentLoaded', function() {
       showToast('录音完成 ' + tarotVoiceState.duration + ' 秒，点发送发出');
     }
   };
-  window.handleTarotImageBg = function(e) {
+    window.handleTarotImageBg = function(e) {
     var file = e.target.files[0]; if (!file) return;
     compressImage(file, function(dataUrl) {
       tarotState.imageBg = dataUrl;
       saveTarotState();
       window.applyTarotBgs();
       showToast('传图背景已保存');
-    });
+    }, 1200);
     e.target.value = '';
   };
   window.resetTarotImageBg = function() { tarotState.imageBg = null; saveTarotState(); window.applyTarotBgs(); };
@@ -2607,27 +2607,28 @@ document.addEventListener('DOMContentLoaded', function() {
   window.resetHomeBg = function() { beautifySettings.homeBg = null; saveBeautifySettings(); applyBeautifyStyles(); };
   window.resetPaperBg = function() { beautifySettings.paperBg = null; saveBeautifySettings(); applyBeautifyStyles(); };
   window.resetIcon = function(id) { delete beautifySettings.icons[id]; saveBeautifySettings(); applyBeautifyStyles(); window.renderBeautifyPage(); };
-  function compressImage(file, callback) {
+  function compressImage(file, callback, maxSize) {
     var reader = new FileReader();
     reader.onload = function(ev) {
       var img = new Image();
       img.onload = function() {
         var canvas = document.createElement('canvas');
-        var MAX = 200;
+        var MAX = maxSize || 1200;
         var w = img.width, h = img.height;
         if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
         else { if (h > MAX) { w *= MAX / h; h = MAX; } }
         canvas.width = w; canvas.height = h;
         var ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        callback(canvas.toDataURL('image/jpeg', 0.8));
+        var quality = MAX > 500 ? 0.88 : 0.8;
+        callback(canvas.toDataURL('image/jpeg', quality));
       };
       img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   }
-  window.handleBeautifyHomeBg = function(e) { var file = e.target.files[0]; if (!file) return; compressImage(file, function(data) { beautifySettings.homeBg = data; saveBeautifySettings(); applyBeautifyStyles(); }); e.target.value = ''; };
-  window.handleBeautifyPaper = function(e) { var file = e.target.files[0]; if (!file) return; compressImage(file, function(data) { beautifySettings.paperBg = data; saveBeautifySettings(); applyBeautifyStyles(); }); e.target.value = ''; };
+window.handleBeautifyHomeBg = function(e) { var file = e.target.files[0]; if (!file) return; compressImage(file, function(data) { beautifySettings.homeBg = data; saveBeautifySettings(); applyBeautifyStyles(); }, 1200); e.target.value = ''; };
+window.handleBeautifyPaper = function(e) { var file = e.target.files[0]; if (!file) return; compressImage(file, function(data) { beautifySettings.paperBg = data; saveBeautifySettings(); applyBeautifyStyles(); }, 1200); e.target.value = ''; };
   window.handleIconUpload = function(e, id) { var file = e.target.files[0]; if (!file) return; compressImage(file, function(data) { beautifySettings.icons[id] = data; saveBeautifySettings(); applyBeautifyStyles(); window.renderBeautifyPage(); }); e.target.value = ''; };
   function applyBeautifyStyles() {
     var fontColor = beautifySettings.fontColor || '';

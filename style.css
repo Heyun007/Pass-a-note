@@ -1282,3 +1282,45 @@ body.dark .song-user-bar {
   margin-top: 6px;
   text-align: right;
 }
+
+/* ====== 真正的毛玻璃：去掉白色底，只保留模糊 ====== */
+.icon-circle,
+.icon-btn-dots,
+.dream-selector,
+.chat-input,
+.chat-input-2,
+.plus-btn,
+.voice-btn,
+.tarot-tab,
+.song-user-bar,
+.page-header .back-btn,
+#pageTarot .dream-selector,
+#pageTarot .tarot-tab {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+#screenChat .chat-input-2,
+#screenChat .plus-btn,
+#pageTarot .tarot-bottom-bar .chat-input-2,
+#pageTarot .tarot-bottom-bar .plus-btn,
+#pageTarot .tarot-bottom-bar .voice-btn {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.dark .icon-circle,
+body.dark .icon-btn-dots,
+body.dark .dream-selector,
+body.dark .chat-input,
+body.dark .chat-input-2,
+body.dark .plus-btn,
+body.dark .voice-btn,
+body.dark .tarot-tab,
+body.dark .song-user-bar,
+body.dark .page-header .back-btn,
+body.dark #screenChat .chat-input-2,
+body.dark #screenChat .plus-btn,
+body.dark #pageTarot .tarot-bottom-bar .chat-input-2,
+body.dark #pageTarot .tarot-bottom-bar .plus-btn,
+body.dark #pageTarot .tarot-bottom-bar .voice-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+}

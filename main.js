@@ -2677,6 +2677,7 @@ window.handleBeautifyPaper = function(e) { var file = e.target.files[0]; if (!fi
         if (svg) svg.style.display = '';
       }
     });
+    
     ICON_KEYS.forEach(function(item) {
       var btn = document.getElementById(item.id);
       if (!btn) return;
@@ -2708,6 +2709,7 @@ window.handleBeautifyPaper = function(e) { var file = e.target.files[0]; if (!fi
         btn.style.padding = '';
       }
     });
+  }
 
   // ========== 通知 ==========
   if (Notification && Notification.permission === 'default') {

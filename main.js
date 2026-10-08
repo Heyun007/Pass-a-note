@@ -2666,12 +2666,15 @@ window.handleBeautifyPaper = function(e) { var file = e.target.files[0]; if (!fi
     }
     var paperBacks = document.querySelectorAll('.paper-back');
     paperBacks.forEach(function(el) {
+      var svg = el.querySelector('svg');
       if (beautifySettings.paperBg) {
         el.style.background = 'url(' + beautifySettings.paperBg + ') center/cover no-repeat';
         el.style.color = 'transparent';
+        if (svg) svg.style.display = 'none';
       } else {
         el.style.background = '';
         el.style.color = '';
+        if (svg) svg.style.display = '';
       }
     });
     ICON_KEYS.forEach(function(item) {
@@ -2680,15 +2683,31 @@ window.handleBeautifyPaper = function(e) { var file = e.target.files[0]; if (!fi
       var svg = btn.querySelector('svg');
       var img = btn.querySelector('.custom-icon-img');
       if (beautifySettings.icons[item.id]) {
-        if (!img) { img = document.createElement('img'); img.className = 'custom-icon-img'; img.style.width = '20px'; img.style.height = '20px'; img.style.objectFit = 'contain'; btn.appendChild(img); }
+        if (!img) {
+          img = document.createElement('img');
+          img.className = 'custom-icon-img';
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'cover';
+          img.style.borderRadius = '50%';
+          img.style.display = 'block';
+          btn.appendChild(img);
+        }
         img.src = beautifySettings.icons[item.id];
         if (svg) svg.style.display = 'none';
+        btn.style.background = 'transparent';
+        btn.style.border = 'none';
+        btn.style.boxShadow = 'none';
+        btn.style.padding = '0';
       } else {
         if (img) img.remove();
         if (svg) svg.style.display = '';
+        btn.style.background = '';
+        btn.style.border = '';
+        btn.style.boxShadow = '';
+        btn.style.padding = '';
       }
     });
-  }
 
   // ========== 通知 ==========
   if (Notification && Notification.permission === 'default') {

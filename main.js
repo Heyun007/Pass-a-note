@@ -1271,7 +1271,6 @@ window.tarotSend = function() {
   var text2 = input2.value.trim();
   if (!text2) return;
 
-  // 检查内置歌单是否为空
   if (typeof BUILTIN_SONGS === 'undefined' || !BUILTIN_SONGS || BUILTIN_SONGS.length === 0) {
     return alert('内置歌单还没有配置，请去 main.js 里配置 BUILTIN_SONGS');
   }
@@ -1289,10 +1288,8 @@ window.tarotSend = function() {
   if (songPromptEl) songPromptEl.innerHTML = '你说：<span>' + escapeHtml(text2) + '</span>';
   if (lyricsContent) lyricsContent.innerHTML = '<div style="text-align:center; padding:40px; font-size:13px; color:var(--gray);"><svg class="spinner" viewBox="0 0 50 50" style="width:30px; height:30px;"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle></svg><div style="margin-top:10px;">正在抽取歌曲中……</div></div>';
 
-  // 假装等待 2-5 秒
   var delay2 = 2000 + Math.random() * 3000;
   setTimeout(function() {
-    // 从内置歌单随机抽一首
     var randomTrack = BUILTIN_SONGS[Math.floor(Math.random() * BUILTIN_SONGS.length)];
     songState.currentSong = randomTrack;
 
@@ -1301,7 +1298,6 @@ window.tarotSend = function() {
     var coverEl = document.getElementById('vinylCover');
     if (coverEl) coverEl.style.backgroundImage = 'url(' + randomTrack.cover + ')';
 
-    // 直接播放内置链接
     songState.audio.src = randomTrack.url;
     songState.audio.onloadedmetadata = function() {
       var duration = songState.audio.duration || 0;
@@ -1317,11 +1313,9 @@ window.tarotSend = function() {
       if (disc) disc.style.animationPlayState = 'paused';
       songState.isPlaying = false;
     };
-    // 既然没歌词，把歌词区清空
     if (lyricsContent) lyricsContent.innerHTML = '<div style="text-align:center; padding:40px; font-size:13px; color:var(--gray);">暂无歌词，点击播放欣赏</div>';
   }, delay2);
 };
-
 // 绑定梦角选择器
 safeBind('tarotDreamSelector', 'click', function(e) {
   e.stopPropagation();

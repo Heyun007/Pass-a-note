@@ -2363,6 +2363,18 @@ window.closeChatSettings = function() {
 function saveChatMessages() { return dbSet('passANoteChatMessages', chatState.messages); }
 function saveChatSettingsToDB() { return dbSet('passANoteChatSettings', chatSettings); }
 
+  // ========== 内置歌单 ==========
+var BUILTIN_SONGS = [
+  {
+    name: 'shut up My Moms Calling (stereophony)',
+    artist: 'TiTi',
+    cover: 'https://p1.music.126.net/MOVXSsnR9TLPrto25FZ6-Q==/109951173114466125.jpg?param=500y500',
+    url: 'https://music.163.com/song/media/outer/url?id=3374262801.mp3'
+  }
+  // 如果你想加第二首，在第一首的大括号后面加一个英文逗号 ","，然后粘贴另一首歌的结构
+];
+// ===============================
+
 // ========== 传歌模式（公开歌单版） ==========
 const API_BASE = 'https://netease-cloud-music-api-backup-five-lime.vercel.app';
 const songState = {

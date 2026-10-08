@@ -339,6 +339,32 @@
       <div class="tarot-grid" id="tarotGrid"></div>
     </div>
 
+          </div>
+    <div class="tarot-bottom-bar" id="tarotBottomBar">
+      <button type="button" class="plus-btn" id="tarotPlusBtn" onclick="window.openTarotPlus()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+      <button class="voice-btn" id="tarotVoiceBtn" title="语音" onclick="window.toggleTarotVoice()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </button>
+      <input type="text" class="chat-input-2" id="tarotInput" placeholder="输入一句话..." onkeydown="if(event.key==='Enter') window.tarotSend()">
+      <button type="button" class="send-btn-2" id="tarotSendBtn" onclick="window.tarotSend()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
 <!-- 感知 - 设置 -->
 <div class="screen page" id="pageTarotSettings">
   <div class="page-header">

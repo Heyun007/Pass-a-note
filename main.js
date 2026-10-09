@@ -1921,8 +1921,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateDrawButtonState() {
     var btn = document.getElementById('drawSecretBtn');
     if (!btn) return;
-    var filledCount = secretState.codes.filter(function(c) { return c.text && c.text.trim() !== ''; }).length;
-    if (filledCount === 0) { btn.disabled = true; btn.textContent = '还没有设置暗号'; return; }
+    if (secretState.codes.length === 0) { btn.disabled = true; btn.textContent = '还没有设置暗号'; return; }
     var now = Date.now();
     var cooldown = 3 * 60 * 1000;
     var elapsed = now - (secretState.lastDrawTime || 0);
@@ -1940,19 +1939,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   window.drawSecret = function() {
-    var availableSecrets = secretState.codes.filter(function(c) { return c.text && c.text.trim() !== ''; });
-    if (availableSecrets.length === 0) return alert('请先点击右侧铅笔，设置至少一条暗号！');
-    var now = Date.now();
-    var cooldown = 3 * 60 * 1000;
-    if (now - (secretState.lastDrawTime || 0) < cooldown) { alert('冷却中，请稍后再试！'); return; }
-    var randomIndex = Math.floor(Math.random() * availableSecrets.length);
-    var pick = availableSecrets[randomIndex].text;
-    var resultEl = document.getElementById('secretResult');
+  if (secretState.codes.length === 0) return alert('请先设置暗号');
+  var now = Date.now();
+  var cooldown = 3 * 60 * 1000;
+  if (now - (secretState.lastDrawTime || 0) < cooldown) { alert('冷却中，请稍后再试！'); return; }
+  // 从全部 10 个位置里抽，空的也算
+  var randomIndex = Math.floor(Math.random() * secretState.codes.length);
+  var pick = secretState.codes[randomIndex].text;
+  var resultEl = document.getElementById('secretResult');
+  if (pick && pick.trim() !== '') {
     resultEl.textContent = '「' + pick + '」';
-    secretState.lastDrawTime = now;
-    saveSecretState();
-    updateDrawButtonState();
-  };
+  } else {
+    resultEl.textContent = '空';
+  }
+  secretState.lastDrawTime = now;
+  saveSecretState();
+  updateDrawButtonState();
+};
 
   // ========== 日记逻辑 ==========
   var currentDiaryMood = '';

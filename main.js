@@ -1106,7 +1106,7 @@ document.addEventListener('DOMContentLoaded', function() {
     saveChatMessages();
     input.value = '';
     window.renderChatMessages();
-    if (chatSettings.ignoreRead && Math.random() < 0.25) {
+    if (chatSettings.ignoreRead && Math.random() < 0.1) {
       var readDelay = (parseFloat(chatSettings.minDelay) || 1) * 1000;
       window.showTyping();
       setTimeout(function() {
@@ -1159,7 +1159,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     saveChatMessages();
     window.renderChatMessages();
-    if (Math.random() < 0.2) {
+    if (Math.random() < 0.05) {
       var recallDelay = 3000 + Math.random() * 5000;
       setTimeout(function() {
         var list = chatState.messages[dreamId];

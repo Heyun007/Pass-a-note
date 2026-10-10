@@ -107,47 +107,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ========== 异步加载数据 ==========
   Promise.all([
-    dbGet('passANoteCards'), dbGet('passANoteStatuses'), dbGet('passANoteDreams'),
-    dbGet('passANoteHistory'), dbGet('passANoteChatRound'), dbGet('passANoteSecrets'),
-    dbGet('passANotePokes'), dbGet('passANoteDiaries'), dbGet('passANoteMails'), dbGet('passANoteBeautify'),
-    dbGet('passANoteChatMessages'), dbGet('passANoteChatSettings'), dbGet('passANoteTarot')
-  ]).then(function(results) {
-    var savedCards = results[0], savedStatuses = results[1], savedDreams = results[2], savedHistory = results[3], savedRound = results[4], savedSecrets = results[5], savedPokes = results[6], savedDiaries = results[7], savedMails = results[8];
-    if (savedCards) { cardState.categories = savedCards.categories || cardState.categories; cardState.cards = savedCards.cards || []; }
-    if (savedStatuses) { statusState.categories = savedStatuses.categories || statusState.categories; statusState.statuses = savedStatuses.statuses || []; }
-    if (savedDreams) { dreamState.dreams = savedDreams.dreams || []; dreamState.currentId = savedDreams.currentId || null; dreamState.lastCheckTime = savedDreams.lastCheckTime || 0; }
-    if (savedHistory) historyState = savedHistory;
-    if (savedRound) chatRoundState = savedRound;
-    if (savedSecrets) secretState = savedSecrets;
-    if (savedPokes) pokeState = savedPokes;
-    if (savedDiaries) diaryState = savedDiaries;
-    if (savedMails) mailState = savedMails;
-    if (results[9]) beautifySettings = results[9];
-    applyBeautifyStyles();
-    if (results[10]) chatState.messages = results[10] || {};
-    if (results[11]) chatSettings = Object.assign(chatSettings, results[11] || {});
-    if (results[12]) {
-      tarotState.groups = results[12].groups || tarotState.groups;
-      tarotState.mode = 'image';
-      tarotState.rounds = results[12].rounds || {};
-      tarotState.imageBg = results[12].imageBg || null;
-    }
-    initSecretSlots();
-    saveSecretState();
-    isDataReady = true;
-    console.log('✅ 数据加载完成');
-    window.renderDreamSelector();
-    window.renderCardManager();
-    window.renderStatusManager();
-    renderChatRound();
-    window.renderPokeManager();
-    if (pageHistory && pageHistory.classList.contains('active')) window.initHistoryPage();
-    hideSongTab();
-  }).catch(function(e) {
-    console.error('数据加载失败', e);
-    showToast('数据加载失败，请刷新重试', true);
-    isDataReady = true;
-  });
+  dbGet('passANoteCards'), dbGet('passANoteStatuses'), dbGet('passANoteDreams'),
+  dbGet('passANoteHistory'), dbGet('passANoteChatRound'), dbGet('passANoteSecrets'),
+  dbGet('passANotePokes'), dbGet('passANoteDiaries'), dbGet('passANoteMails'), dbGet('passANoteBeautify'),
+  dbGet('passANoteChatMessages'), dbGet('passANoteChatSettings'), dbGet('passANoteTarot')
+]).then(function(results) {
+  var savedCards = results[0], savedStatuses = results[1], savedDreams = results[2], savedHistory = results[3], savedRound = results[4], savedSecrets = results[5], savedPokes = results[6], savedDiaries = results[7], savedMails = results[8];
+  if (savedCards) { cardState.categories = savedCards.categories || cardState.categories; cardState.cards = savedCards.cards || []; }
+  if (savedStatuses) { statusState.categories = savedStatuses.categories || statusState.categories; statusState.statuses = savedStatuses.statuses || []; }
+  if (savedDreams) { dreamState.dreams = savedDreams.dreams || []; dreamState.currentId = savedDreams.currentId || null; dreamState.lastCheckTime = savedDreams.lastCheckTime || 0; }
+  if (savedHistory) historyState = savedHistory;
+  if (savedRound) chatRoundState = savedRound;
+  if (savedSecrets) secretState = savedSecrets;
+  if (savedPokes) pokeState = savedPokes;
+  if (savedDiaries) diaryState = savedDiaries;
+  if (savedMails) mailState = savedMails;
+  if (results[9]) beautifySettings = results[9];
+  applyBeautifyStyles();
+  if (results[10]) chatState.messages = results[10] || {};
+  if (results[11]) chatSettings = Object.assign(chatSettings, results[11] || {});
+  if (results[12]) {
+    tarotState.groups = results[12].groups || tarotState.groups;
+    tarotState.mode = 'image';
+    tarotState.rounds = results[12].rounds || {};
+    tarotState.imageBg = results[12].imageBg || null;
+  }
+  initSecretSlots();
+  saveSecretState();
+  isDataReady = true;
+  console.log('✅ 数据加载完成');
+  window.renderDreamSelector();
+  window.renderCardManager();
+  window.renderStatusManager();
+  renderChatRound();
+  window.renderPokeManager();
+  if (pageHistory && pageHistory.classList.contains('active')) window.initHistoryPage();
+  hideSongTab();
+  setTimeout(applyBeautifyStyles, 500);
+}).catch(function(e) {
+  console.error('数据加载失败', e);
+  showToast('数据加载失败，请刷新重试', true);
+  isDataReady = true;
+  setTimeout(applyBeautifyStyles, 500);
+});
 
   // 隐藏模式切换栏（现在只有传图模式）
   function hideSongTab() {

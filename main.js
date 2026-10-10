@@ -927,6 +927,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.closeChatPlus();
     if (type === 'secret') window.navigateTo('pageSecretCode');
     if (type === 'poke') window.chatPoke();
+else if (type === 'pokeSet') window.navigateTo('pagePokes');
     if (type === 'choice') window.openChoiceModal();
     if (type === 'call') window.chatCall();
     if (type === 'modeToggle') { var btn = document.getElementById('modeToggle'); if (btn) btn.click(); }
